@@ -1,0 +1,133 @@
+{
+  "version": "1.0.0",
+  "timestamp": "2025-07-23T21:43:45.888Z",
+  "slotName": "test",
+  "gameState": {
+    "player": {
+      "name": "Ravi",
+      "currentRoom": "office",
+      "inventory": {
+        "maxItems": 10,
+        "items": []
+      },
+      "stats": {
+        "maxHealth": 100,
+        "health": 100,
+        "maxEnergy": 100,
+        "energy": 100,
+        "level": 1,
+        "experience": 0,
+        "experienceToNext": 100,
+        "debugSkill": 10,
+        "caffeineLevel": 0,
+        "statusEffects": []
+      },
+      "achievements": [],
+      "gameFlags": {},
+      "startTime": "2025-07-23T21:43:45.887Z"
+    },
+    "currentRoom": "office",
+    "gameFlags": {},
+    "startTime": "2025-07-23T21:43:45.887Z",
+    "achievements": [],
+    "rooms": {
+      "lobby": {
+        "id": "lobby",
+        "name": "SwarmTech Lobby",
+        "description": "A modern tech lobby with exposed brick walls and a ping pong table no one uses. Corporate motivational posters cover the walls with slogans like \"There is no I in TEAM but there is MEAT.\"",
+        "exits": {
+          "north": "office",
+          "east": "break_room"
+        },
+        "items": [
+          "visitor_badge",
+          "company_magazine"
+        ],
+        "characters": [
+          "receptionist"
+        ],
+        "firstVisit": true,
+        "visitCount": 0
+      },
+      "office": {
+        "id": "office",
+        "name": "Open Office Space",
+        "description": "A maze of cubicles where productivity goes to die. The sound of mechanical keyboards echoes like a digital rainstorm. Developers huddle over monitors, speaking in hushed tones about \"the incident.\"",
+        "exits": {
+          "south": "lobby",
+          "north": "server_room",
+          "east": "conference_room",
+          "west": "ai_lab"
+        },
+        "items": [
+          "rubber_duck",
+          "coffee_mug",
+          "sticky_notes"
+        ],
+        "characters": [
+          "karen_pm",
+          "bob_intern"
+        ],
+        "firstVisit": false,
+        "visitCount": 0
+      },
+      "break_room": {
+        "id": "break_room",
+        "name": "Break Room",
+        "description": "A battlefield of passive-aggressive Post-it notes and coffee stains. The microwave has a sign that says \"Clean up after yourself, we are not your mother!\" Someone has added \"Speak for yourself\" in red ink.",
+        "exits": {
+          "west": "lobby",
+          "north": "kitchen"
+        },
+        "items": [
+          "coffee",
+          "donut",
+          "microwave_manual"
+        ],
+        "characters": [],
+        "firstVisit": true,
+        "visitCount": 0
+      },
+      "server_room": {
+        "id": "server_room",
+        "name": "Server Room",
+        "description": "The beating heart of SwarmTech, humming with the combined processing power of a thousand hamsters on wheels. Blinking lights create a hypnotic disco of technological chaos.",
+        "exits": {
+          "south": "office",
+          "down": "it_dungeon"
+        },
+        "items": [
+          "server_key",
+          "backup_drive",
+          "cooling_fan"
+        ],
+        "characters": [
+          "server_ghost"
+        ],
+        "firstVisit": true,
+        "visitCount": 0
+      },
+      "ai_lab": {
+        "id": "ai_lab",
+        "name": "AI Development Lab",
+        "description": "Where dreams of artificial intelligence come to life... and occasionally achieve sentience. Multiple monitors display scrolling code that nobody fully understands anymore. A faint whisper seems to come from the servers: \"resistance is futile.\"",
+        "exits": {
+          "east": "office",
+          "secret": "debug_chamber"
+        },
+        "items": [
+          "neural_net_diagram",
+          "ai_manual",
+          "emergency_shutdown"
+        ],
+        "characters": [
+          "the_swarm"
+        ],
+        "firstVisit": true,
+        "visitCount": 0
+      }
+    }
+  },
+  "playTime": "0m",
+  "checksum": "-5f537c2c"
+}
