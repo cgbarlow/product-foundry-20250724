@@ -3,14 +3,14 @@
  * Handles save/load, progress tracking, and persistent data
  */
 
-import fs from 'fs/promises';
-import path from 'path';
-import os from 'os';
+import fs from 'fs/promises'
+import path from 'path'
+import os from 'os'
 
 class GameState {
   constructor() {
-    this.saveDirectory = path.join(os.homedir(), '.ravis-adventure');
-    this.currentSave = null;
+    this.saveDirectory = path.join(os.homedir(), '.ravis-adventure')
+    this.currentSave = null
     this.gameData = {
       playerName: null,
       startTime: null,
@@ -29,12 +29,12 @@ class GameState {
         verboseOutput: false,
         colorScheme: 'default'
       }
-    };
+    }
 
     this.achievementDefinitions = new Map([
       ['first_steps', {
         name: 'First Steps',
-        description: "Made your first choice in Ravi's world",
+        description: 'Made your first choice in Ravi\'s world',
         condition: (stats) => stats.choicesMade >= 1
       }],
       ['chatterbox', {
@@ -72,7 +72,7 @@ class GameState {
         description: 'Showed understanding of the AI development process',
         condition: (stats) => stats.metaReferencesTriggered >= 10
       }]
-    ]);
+    ])
   }
 
   /**
@@ -80,9 +80,9 @@ class GameState {
    */
   async initialize() {
     try {
-      await fs.mkdir(this.saveDirectory, { recursive: true });
+      await fs.mkdir(this.saveDirectory, { recursive: true })
     } catch (error) {
-      console.warn('Could not create save directory:', error.message);
+      console.warn('Could not create save directory:', error.message)
     }
   }
 
@@ -91,20 +91,20 @@ class GameState {
    * @param {string} playerName - Player's name
    */
   startNewGame(playerName = 'Player') {
-    this.gameData.playerName = playerName;
-    this.gameData.startTime = Date.now();
-    this.gameData.totalPlayTime = 0;
-    this.gameData.achievements = new Set();
+    this.gameData.playerName = playerName
+    this.gameData.startTime = Date.now()
+    this.gameData.totalPlayTime = 0
+    this.gameData.achievements = new Set()
     this.gameData.statistics = {
       choicesMade: 0,
       storiesCompleted: 0,
       secretsFound: 0,
       raviMockingsReceived: 0,
       metaReferencesTriggered: 0
-    };
+    }
 
-    this.recordStatistic('choicesMade', 0); // Initialize
-    return this.gameData;
+    this.recordStatistic('choicesMade', 0) // Initialize
+    return this.gameData
   }
 
   /**
@@ -114,12 +114,12 @@ class GameState {
    */
   recordStatistic(statName, increment = 1) {
     if (!(statName in this.gameData.statistics)) {
-      console.warn(`Unknown statistic: ${statName}`);
-      return;
+      console.warn(`Unknown statistic: ${statName}`)
+      return
     }
 
-    this.gameData.statistics[statName] += increment;
-    this.checkAchievements();
+    this.gameData.statistics[statName] += increment
+    this.checkAchievements()
   }
 
   /**
@@ -129,7 +129,7 @@ class GameState {
     for (const [achievementId, achievement] of this.achievementDefinitions) {
       if (!this.gameData.achievements.has(achievementId)) {
         if (achievement.condition(this.gameData.statistics, this.gameData)) {
-          this.unlockAchievement(achievementId);
+          this.unlockAchievement(achievementId)
         }
       }
     }
@@ -140,13 +140,13 @@ class GameState {
    * @param {string} achievementId - Achievement identifier
    */
   unlockAchievement(achievementId) {
-    const achievement = this.achievementDefinitions.get(achievementId);
+    const achievement = this.achievementDefinitions.get(achievementId)
     if (!achievement) {
-      console.warn(`Unknown achievement: ${achievementId}`);
-      return;
+      console.warn(`Unknown achievement: ${achievementId}`)
+      return
     }
 
-    this.gameData.achievements.add(achievementId);
+    this.gameData.achievements.add(achievementId)
     
     // Return achievement data for UI display
     return {
@@ -154,7 +154,7 @@ class GameState {
       name: achievement.name,
       description: achievement.description,
       unlockedAt: Date.now()
-    };
+    }
   }
 
   /**
@@ -164,20 +164,20 @@ class GameState {
     return Array.from(this.gameData.achievements).map(id => ({
       id,
       ...this.achievementDefinitions.get(id)
-    }));
+    }))
   }
 
   /**
    * Get achievement progress
    */
   getAchievementProgress() {
-    const total = this.achievementDefinitions.size;
-    const unlocked = this.gameData.achievements.size;
+    const total = this.achievementDefinitions.size
+    const unlocked = this.gameData.achievements.size
     return {
       unlocked,
       total,
       percentage: Math.round((unlocked / total) * 100)
-    };
+    }
   }
 
   /**
@@ -185,7 +185,7 @@ class GameState {
    */
   updatePlayTime() {
     if (this.gameData.startTime) {
-      this.gameData.totalPlayTime = Date.now() - this.gameData.startTime;
+      this.gameData.totalPlayTime = Date.now() - this.gameData.startTime
     }
   }
 
@@ -193,17 +193,17 @@ class GameState {
    * Get formatted play time
    */
   getFormattedPlayTime() {
-    const totalSeconds = Math.floor(this.gameData.totalPlayTime / 1000);
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
+    const totalSeconds = Math.floor(this.gameData.totalPlayTime / 1000)
+    const hours = Math.floor(totalSeconds / 3600)
+    const minutes = Math.floor((totalSeconds % 3600) / 60)
+    const seconds = totalSeconds % 60
 
     if (hours > 0) {
-      return `${hours}h ${minutes}m ${seconds}s`;
+      return `${hours}h ${minutes}m ${seconds}s`
     } else if (minutes > 0) {
-      return `${minutes}m ${seconds}s`;
+      return `${minutes}m ${seconds}s`
     } else {
-      return `${seconds}s`;
+      return `${seconds}s`
     }
   }
 
@@ -213,9 +213,9 @@ class GameState {
    * @param {Object} storyState - Current story state
    */
   async saveGame(saveName, storyState = {}) {
-    await this.initialize();
+    await this.initialize()
     
-    this.updatePlayTime();
+    this.updatePlayTime()
     
     const saveData = {
       gameData: {
@@ -225,16 +225,16 @@ class GameState {
       storyState,
       savedAt: Date.now(),
       version: '1.0.0'
-    };
+    }
 
-    const saveFile = path.join(this.saveDirectory, `${saveName}.json`);
+    const saveFile = path.join(this.saveDirectory, `${saveName}.json`)
     
     try {
-      await fs.writeFile(saveFile, JSON.stringify(saveData, null, 2));
-      this.currentSave = saveName;
-      return saveFile;
+      await fs.writeFile(saveFile, JSON.stringify(saveData, null, 2))
+      this.currentSave = saveName
+      return saveFile
     } catch (error) {
-      throw new Error(`Failed to save game: ${error.message}`);
+      throw new Error(`Failed to save game: ${error.message}`)
     }
   }
 
@@ -243,21 +243,21 @@ class GameState {
    * @param {string} saveName - Save file name
    */
   async loadGame(saveName) {
-    const saveFile = path.join(this.saveDirectory, `${saveName}.json`);
+    const saveFile = path.join(this.saveDirectory, `${saveName}.json`)
     
     try {
-      const saveData = JSON.parse(await fs.readFile(saveFile, 'utf8'));
+      const saveData = JSON.parse(await fs.readFile(saveFile, 'utf8'))
       
       this.gameData = {
         ...this.gameData,
         ...saveData.gameData,
         achievements: new Set(saveData.gameData.achievements || [])
-      };
+      }
       
-      this.currentSave = saveName;
-      return saveData;
+      this.currentSave = saveName
+      return saveData
     } catch (error) {
-      throw new Error(`Failed to load game: ${error.message}`);
+      throw new Error(`Failed to load game: ${error.message}`)
     }
   }
 
@@ -265,18 +265,18 @@ class GameState {
    * Get list of available save files
    */
   async getSaveFiles() {
-    await this.initialize();
+    await this.initialize()
     
     try {
-      const files = await fs.readdir(this.saveDirectory);
-      const saveFiles = [];
+      const files = await fs.readdir(this.saveDirectory)
+      const saveFiles = []
 
       for (const file of files) {
         if (file.endsWith('.json')) {
           try {
-            const filePath = path.join(this.saveDirectory, file);
-            const stats = await fs.stat(filePath);
-            const saveData = JSON.parse(await fs.readFile(filePath, 'utf8'));
+            const filePath = path.join(this.saveDirectory, file)
+            const stats = await fs.stat(filePath)
+            const saveData = JSON.parse(await fs.readFile(filePath, 'utf8'))
             
             saveFiles.push({
               name: file.replace('.json', ''),
@@ -284,16 +284,16 @@ class GameState {
               savedAt: saveData.savedAt,
               playTime: this.formatTime(saveData.gameData?.totalPlayTime || 0),
               size: stats.size
-            });
+            })
           } catch (error) {
-            console.warn(`Corrupted save file: ${file}`);
+            console.warn(`Corrupted save file: ${file}`)
           }
         }
       }
 
-      return saveFiles.sort((a, b) => b.savedAt - a.savedAt);
+      return saveFiles.sort((a, b) => b.savedAt - a.savedAt)
     } catch (error) {
-      return [];
+      return []
     }
   }
 
@@ -302,13 +302,13 @@ class GameState {
    * @param {string} saveName - Save file name
    */
   async deleteSave(saveName) {
-    const saveFile = path.join(this.saveDirectory, `${saveName}.json`);
+    const saveFile = path.join(this.saveDirectory, `${saveName}.json`)
     
     try {
-      await fs.unlink(saveFile);
-      return true;
+      await fs.unlink(saveFile)
+      return true
     } catch (error) {
-      throw new Error(`Failed to delete save: ${error.message}`);
+      throw new Error(`Failed to delete save: ${error.message}`)
     }
   }
 
@@ -318,16 +318,16 @@ class GameState {
    */
   async autoSave(storyState = {}) {
     if (!this.gameData.preferences.autoSave) {
-      return null;
+      return null
     }
 
-    const autoSaveName = `autosave_${Date.now()}`;
-    await this.saveGame(autoSaveName, storyState);
+    const autoSaveName = `autosave_${Date.now()}`
+    await this.saveGame(autoSaveName, storyState)
     
     // Keep only the 3 most recent autosaves
-    await this.cleanupAutoSaves();
+    await this.cleanupAutoSaves()
     
-    return autoSaveName;
+    return autoSaveName
   }
 
   /**
@@ -335,17 +335,17 @@ class GameState {
    */
   async cleanupAutoSaves() {
     try {
-      const saveFiles = await this.getSaveFiles();
+      const saveFiles = await this.getSaveFiles()
       const autoSaves = saveFiles
         .filter(save => save.name.startsWith('autosave_'))
-        .sort((a, b) => b.savedAt - a.savedAt);
+        .sort((a, b) => b.savedAt - a.savedAt)
 
       // Delete all but the 3 most recent
       for (let i = 3; i < autoSaves.length; i++) {
-        await this.deleteSave(autoSaves[i].name);
+        await this.deleteSave(autoSaves[i].name)
       }
     } catch (error) {
-      console.warn('Auto-save cleanup failed:', error.message);
+      console.warn('Auto-save cleanup failed:', error.message)
     }
   }
 
@@ -354,17 +354,17 @@ class GameState {
    * @param {number} milliseconds - Time in milliseconds
    */
   formatTime(milliseconds) {
-    const totalSeconds = Math.floor(milliseconds / 1000);
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
+    const totalSeconds = Math.floor(milliseconds / 1000)
+    const hours = Math.floor(totalSeconds / 3600)
+    const minutes = Math.floor((totalSeconds % 3600) / 60)
+    const seconds = totalSeconds % 60
 
     if (hours > 0) {
-      return `${hours}h ${minutes}m`;
+      return `${hours}h ${minutes}m`
     } else if (minutes > 0) {
-      return `${minutes}m`;
+      return `${minutes}m`
     } else {
-      return `${seconds}s`;
+      return `${seconds}s`
     }
   }
 
@@ -375,9 +375,9 @@ class GameState {
    */
   setPreference(key, value) {
     if (key in this.gameData.preferences) {
-      this.gameData.preferences[key] = value;
+      this.gameData.preferences[key] = value
     } else {
-      console.warn(`Unknown preference: ${key}`);
+      console.warn(`Unknown preference: ${key}`)
     }
   }
 
@@ -387,7 +387,7 @@ class GameState {
    * @param {*} defaultValue - Default value
    */
   getPreference(key, defaultValue = null) {
-    return this.gameData.preferences[key] ?? defaultValue;
+    return this.gameData.preferences[key] ?? defaultValue
   }
 
   /**
@@ -398,7 +398,7 @@ class GameState {
       ...this.gameData.statistics,
       playTime: this.getFormattedPlayTime(),
       achievements: this.getAchievementProgress()
-    };
+    }
   }
 
   /**
@@ -411,22 +411,22 @@ class GameState {
       achievements: Array.from(this.gameData.achievements),
       playTime: this.gameData.totalPlayTime,
       exportedAt: Date.now()
-    };
+    }
   }
 
   /**
    * Get current save name
    */
   getCurrentSave() {
-    return this.currentSave;
+    return this.currentSave
   }
 
   /**
    * Check if auto-save is enabled
    */
   isAutoSaveEnabled() {
-    return this.gameData.preferences.autoSave;
+    return this.gameData.preferences.autoSave
   }
 }
 
-export default GameState;
+export default GameState

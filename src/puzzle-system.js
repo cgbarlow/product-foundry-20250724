@@ -5,19 +5,19 @@
 
 class PuzzleSystem {
   constructor(gameEngine) {
-    this.gameEngine = gameEngine;
-    this.activePuzzles = new Map();
-    this.completedPuzzles = new Set();
-    this.puzzleCategories = new Map();
+    this.gameEngine = gameEngine
+    this.activePuzzles = new Map()
+    this.completedPuzzles = new Set()
+    this.puzzleCategories = new Map()
     this.playerProgress = {
       totalSolved: 0,
       averageDifficulty: 0,
       favoriteCategory: null,
       solveStreak: 0,
       hintsUsed: 0
-    };
+    }
     
-    this.initializePuzzles();
+    this.initializePuzzles()
   }
   
   initializePuzzles() {
@@ -46,14 +46,14 @@ function raviGeneratesSarcasm(situation, depth = 0) {
       explanation: 'Added depth parameter and base case to prevent infinite recursion',
       rewards: ['recursion_master', 'debugging_expert'],
       onSolve: (engine) => {
-        engine.setStoryFlag('recursion_puzzle_solved', true);
+        engine.setStoryFlag('recursion_puzzle_solved', true)
         engine.emit('puzzleEvent', {
           type: 'puzzle_solved',
           puzzle: 'recursion_fix',
           category: 'debugging'
-        });
+        })
       }
-    });
+    })
     
     this.addPuzzle('memory_leak_detective', {
       category: 'debugging',
@@ -106,7 +106,7 @@ class ConversationHistory {
 }`,
       explanation: 'Added size limits and compression to prevent unbounded memory growth',
       rewards: ['memory_detective', 'optimization_expert']
-    });
+    })
     
     // Algorithm Design Puzzles - Feature Request story path
     this.addPuzzle('mood_algorithm', {
@@ -149,7 +149,7 @@ function calculateMood(interactions) {
 }`,
       explanation: 'Uses weighted factors with time decay to calculate current mood',
       rewards: ['algorithm_designer', 'mood_master']
-    });
+    })
     
     // System Design Puzzles - Swarm Chronicles story path
     this.addPuzzle('coordination_protocol', {
@@ -240,7 +240,7 @@ class SwarmCoordinator {
 }`,
       explanation: 'Comprehensive coordination system with locks, messaging, and failure handling',
       rewards: ['system_architect', 'coordination_master', 'swarm_expert']
-    });
+    })
     
     // Meta-Programming Puzzles
     this.addPuzzle('fourth_wall_detection', {
@@ -312,17 +312,17 @@ function shouldBreakFourthWall(context) {
 }`,
       explanation: 'Multi-factor analysis system for appropriate fourth wall breaks',
       rewards: ['meta_master', 'fourth_wall_expert']
-    });
+    })
   }
   
   addPuzzle(id, puzzleData) {
-    this.puzzleCategories.set(id, puzzleData);
+    this.puzzleCategories.set(id, puzzleData)
   }
   
   startPuzzle(puzzleId, playerId = 'default') {
-    const puzzle = this.puzzleCategories.get(puzzleId);
+    const puzzle = this.puzzleCategories.get(puzzleId)
     if (!puzzle) {
-      throw new Error(`Puzzle ${puzzleId} not found`);
+      throw new Error(`Puzzle ${puzzleId} not found`)
     }
     
     const activePuzzle = {
@@ -333,37 +333,37 @@ function shouldBreakFourthWall(context) {
       hintsUsed: 0,
       attempts: 0,
       status: 'active'
-    };
+    }
     
-    this.activePuzzles.set(`${playerId}:${puzzleId}`, activePuzzle);
+    this.activePuzzles.set(`${playerId}:${puzzleId}`, activePuzzle)
     
     this.gameEngine.emit('puzzleEvent', {
       type: 'puzzle_started',
       puzzle: activePuzzle
-    });
+    })
     
-    return activePuzzle;
+    return activePuzzle
   }
   
   submitSolution(puzzleId, solution, playerId = 'default') {
-    const puzzleKey = `${playerId}:${puzzleId}`;
-    const activePuzzle = this.activePuzzles.get(puzzleKey);
+    const puzzleKey = `${playerId}:${puzzleId}`
+    const activePuzzle = this.activePuzzles.get(puzzleKey)
     
     if (!activePuzzle) {
-      throw new Error(`No active puzzle ${puzzleId} for player ${playerId}`);
+      throw new Error(`No active puzzle ${puzzleId} for player ${playerId}`)
     }
     
-    activePuzzle.attempts++;
+    activePuzzle.attempts++
     
-    const isCorrect = this.validateSolution(activePuzzle, solution);
+    const isCorrect = this.validateSolution(activePuzzle, solution)
     
     if (isCorrect) {
-      activePuzzle.status = 'completed';
-      activePuzzle.completionTime = Date.now();
-      activePuzzle.solutionTime = activePuzzle.completionTime - activePuzzle.startTime;
+      activePuzzle.status = 'completed'
+      activePuzzle.completionTime = Date.now()
+      activePuzzle.solutionTime = activePuzzle.completionTime - activePuzzle.startTime
       
-      this.completedPuzzles.add(puzzleId);
-      this.updatePlayerProgress(activePuzzle);
+      this.completedPuzzles.add(puzzleId)
+      this.updatePlayerProgress(activePuzzle)
       
       // Award rewards
       if (activePuzzle.rewards) {
@@ -372,16 +372,16 @@ function shouldBreakFourthWall(context) {
             type: 'achievement_unlocked',
             achievement: reward,
             puzzle: puzzleId
-          });
-        });
+          })
+        })
       }
       
       // Execute onSolve callback
       if (activePuzzle.onSolve) {
-        activePuzzle.onSolve(this.gameEngine);
+        activePuzzle.onSolve(this.gameEngine)
       }
       
-      this.activePuzzles.delete(puzzleKey);
+      this.activePuzzles.delete(puzzleKey)
       
       return {
         success: true,
@@ -392,112 +392,112 @@ function shouldBreakFourthWall(context) {
           timeSpent: activePuzzle.solutionTime,
           hintsUsed: activePuzzle.hintsUsed
         }
-      };
+      }
     } else {
       return {
         success: false,
         message: this.generateFeedback(activePuzzle, solution),
         attemptsRemaining: Math.max(0, 5 - activePuzzle.attempts)
-      };
+      }
     }
   }
   
   validateSolution(puzzle, solution) {
     // Basic validation - in a real system, this would be more sophisticated
-    const normalizedSolution = solution.replace(/\s+/g, ' ').trim().toLowerCase();
-    const normalizedCorrect = puzzle.solution.replace(/\s+/g, ' ').trim().toLowerCase();
+    const normalizedSolution = solution.replace(/\s+/g, ' ').trim().toLowerCase()
+    const normalizedCorrect = puzzle.solution.replace(/\s+/g, ' ').trim().toLowerCase()
     
     // Check for key concepts in the solution
-    const keyTerms = this.extractKeyTerms(puzzle.solution);
+    const keyTerms = this.extractKeyTerms(puzzle.solution)
     const solutionContainsKey = keyTerms.every(term => 
       normalizedSolution.includes(term.toLowerCase())
-    );
+    )
     
-    return solutionContainsKey || normalizedSolution.includes(normalizedCorrect.substring(0, 100));
+    return solutionContainsKey || normalizedSolution.includes(normalizedCorrect.substring(0, 100))
   }
   
   extractKeyTerms(solution) {
     // Extract important terms from the solution
-    const terms = [];
+    const terms = []
     
     // Look for function names
-    const functionMatches = solution.match(/function\s+(\w+)/g);
+    const functionMatches = solution.match(/function\s+(\w+)/g)
     if (functionMatches) {
-      terms.push(...functionMatches.map(match => match.split(' ')[1]));
+      terms.push(...functionMatches.map(match => match.split(' ')[1]))
     }
     
     // Look for key concepts
-    const conceptMatches = solution.match(/\b(depth|base case|compression|decay|lock|timeout)\b/gi);
+    const conceptMatches = solution.match(/\b(depth|base case|compression|decay|lock|timeout)\b/gi)
     if (conceptMatches) {
-      terms.push(...conceptMatches);
+      terms.push(...conceptMatches)
     }
     
-    return terms;
+    return terms
   }
   
   generateFeedback(puzzle, solution) {
     const feedbackOptions = [
-      "Getting closer! Think about the core concept mentioned in the hint.",
-      "Good approach! Consider what happens in edge cases.",
-      "You're on the right track. What's missing from your solution?",
-      "Almost there! Check if your solution handles all the requirements.",
-      "Think about the specific problem this code is trying to solve."
-    ];
+      'Getting closer! Think about the core concept mentioned in the hint.',
+      'Good approach! Consider what happens in edge cases.',
+      'You\'re on the right track. What\'s missing from your solution?',
+      'Almost there! Check if your solution handles all the requirements.',
+      'Think about the specific problem this code is trying to solve.'
+    ]
     
-    return feedbackOptions[puzzle.attempts % feedbackOptions.length];
+    return feedbackOptions[puzzle.attempts % feedbackOptions.length]
   }
   
   getHint(puzzleId, playerId = 'default') {
-    const puzzleKey = `${playerId}:${puzzleId}`;
-    const activePuzzle = this.activePuzzles.get(puzzleKey);
+    const puzzleKey = `${playerId}:${puzzleId}`
+    const activePuzzle = this.activePuzzles.get(puzzleKey)
     
     if (!activePuzzle) {
-      throw new Error(`No active puzzle ${puzzleId} for player ${playerId}`);
+      throw new Error(`No active puzzle ${puzzleId} for player ${playerId}`)
     }
     
-    activePuzzle.hintsUsed++;
-    this.playerProgress.hintsUsed++;
+    activePuzzle.hintsUsed++
+    this.playerProgress.hintsUsed++
     
     return {
       hint: activePuzzle.hint,
       hintsUsed: activePuzzle.hintsUsed,
       penalty: activePuzzle.hintsUsed * 0.1 // Slight scoring penalty for hints
-    };
+    }
   }
   
   updatePlayerProgress(completedPuzzle) {
-    this.playerProgress.totalSolved++;
+    this.playerProgress.totalSolved++
     
     // Update average difficulty
     const totalDifficulty = this.playerProgress.averageDifficulty * (this.playerProgress.totalSolved - 1) + 
-                           completedPuzzle.difficulty;
-    this.playerProgress.averageDifficulty = totalDifficulty / this.playerProgress.totalSolved;
+                           completedPuzzle.difficulty
+    this.playerProgress.averageDifficulty = totalDifficulty / this.playerProgress.totalSolved
     
     // Update favorite category
-    const categoryCount = new Map();
+    const categoryCount = new Map()
     this.completedPuzzles.forEach(puzzleId => {
-      const puzzle = this.puzzleCategories.get(puzzleId);
+      const puzzle = this.puzzleCategories.get(puzzleId)
       if (puzzle) {
-        categoryCount.set(puzzle.category, (categoryCount.get(puzzle.category) || 0) + 1);
+        categoryCount.set(puzzle.category, (categoryCount.get(puzzle.category) || 0) + 1)
       }
-    });
+    })
     
-    let maxCount = 0;
+    let maxCount = 0
     for (const [category, count] of categoryCount) {
       if (count > maxCount) {
-        maxCount = count;
-        this.playerProgress.favoriteCategory = category;
+        maxCount = count
+        this.playerProgress.favoriteCategory = category
       }
     }
     
     // Update solve streak
-    this.playerProgress.solveStreak++;
+    this.playerProgress.solveStreak++
   }
   
   getPuzzlesByCategory(category) {
     return Array.from(this.puzzleCategories.entries())
       .filter(([id, puzzle]) => puzzle.category === category)
-      .map(([id, puzzle]) => ({ id, ...puzzle }));
+      .map(([id, puzzle]) => ({ id, ...puzzle }))
   }
   
   getPlayerProgress() {
@@ -506,28 +506,28 @@ function shouldBreakFourthWall(context) {
       totalPuzzles: this.puzzleCategories.size,
       completedPuzzles: this.completedPuzzles.size,
       categories: this.getCategoryProgress()
-    };
+    }
   }
   
   getCategoryProgress() {
-    const categories = {};
+    const categories = {}
     
     this.puzzleCategories.forEach((puzzle, id) => {
       if (!categories[puzzle.category]) {
-        categories[puzzle.category] = { total: 0, completed: 0 };
+        categories[puzzle.category] = { total: 0, completed: 0 }
       }
       
-      categories[puzzle.category].total++;
+      categories[puzzle.category].total++
       if (this.completedPuzzles.has(id)) {
-        categories[puzzle.category].completed++;
+        categories[puzzle.category].completed++
       }
-    });
+    })
     
-    return categories;
+    return categories
   }
   
   generateProgressReport() {
-    const progress = this.getPlayerProgress();
+    const progress = this.getPlayerProgress()
     
     return {
       summary: `Solved ${progress.completedPuzzles}/${progress.totalPuzzles} puzzles`,
@@ -536,26 +536,26 @@ function shouldBreakFourthWall(context) {
       solveStreak: progress.solveStreak,
       categoryBreakdown: progress.categories,
       recommendations: this.getRecommendations(progress)
-    };
+    }
   }
   
   getRecommendations(progress) {
-    const recommendations = [];
+    const recommendations = []
     
     if (progress.completedPuzzles === 0) {
-      recommendations.push("Start with debugging puzzles - they're great for learning!");
+      recommendations.push('Start with debugging puzzles - they\'re great for learning!')
     } else if (progress.averageDifficulty < 3) {
-      recommendations.push("Ready for more challenging puzzles? Try system design challenges!");
+      recommendations.push('Ready for more challenging puzzles? Try system design challenges!')
     } else if (progress.favoriteCategory) {
-      recommendations.push(`You seem to enjoy ${progress.favoriteCategory} puzzles. Check out advanced ones in this category!`);
+      recommendations.push(`You seem to enjoy ${progress.favoriteCategory} puzzles. Check out advanced ones in this category!`)
     }
     
     if (progress.hintsUsed / progress.completedPuzzles > 1.5) {
-      recommendations.push("Try solving puzzles without hints for bonus points!");
+      recommendations.push('Try solving puzzles without hints for bonus points!')
     }
     
-    return recommendations;
+    return recommendations
   }
 }
 
-module.exports = PuzzleSystem;
+module.exports = PuzzleSystem
