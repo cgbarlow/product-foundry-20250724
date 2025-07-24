@@ -950,6 +950,187 @@ class Ravi {
   }
 
   /**
+   * Initialize swarm meta-commentary monitoring
+   * @param {SwarmMetaCommentaryMonitor} monitor - The swarm monitoring instance
+   */
+  initializeSwarmMonitoring(monitor) {
+    this.swarmMonitor = monitor
+    
+    // Subscribe to swarm commentary events
+    this.swarmMonitor.on('commentary-generated', (data) => {
+      this.handleSwarmCommentary(data)
+    })
+    
+    this.swarmMonitor.on('monitoring-started', () => {
+      console.log(chalk.italic.cyan('\nRavi: "Oh! The swarm monitoring just activated. Now I can see what\'s happening behind the scenes!"'))
+    })
+    
+    this.swarmMonitor.on('pattern-detected', (pattern) => {
+      this.handleSwarmPattern(pattern)
+    })
+  }
+
+  /**
+   * Handle swarm commentary from the monitoring system
+   * @param {Object} commentaryData - Commentary data from monitor
+   */
+  handleSwarmCommentary(commentaryData) {
+    const { commentary, type, metadata } = commentaryData
+    
+    // Add Ravi's personality to the technical commentary
+    const personalizedCommentary = this.personalizeSwarmCommentary(commentary, type, metadata)
+    
+    // Display with appropriate styling based on type
+    const styleMap = {
+      'swarm-activity': chalk.italic.cyan,
+      'pattern-detection': chalk.italic.blue,
+      'development-event': chalk.italic.magenta,
+      'adaptive-behavior': chalk.italic.green
+    }
+    
+    const styleFunc = styleMap[type] || chalk.italic.cyan
+    
+    setTimeout(() => {
+      console.log(styleFunc(`\nRavi (swarm-aware): "${personalizedCommentary}"`))
+    }, 1000 + Math.random() * 2000) // Stagger commentary timing
+  }
+
+  /**
+   * Handle detected swarm patterns
+   * @param {Object} pattern - Pattern detection data
+   */
+  handleSwarmPattern(pattern) {
+    const { pattern: patternType, description, intensity } = pattern
+    
+    // Generate Ravi's reaction to the pattern
+    const reactions = {
+      'agent_scaling': [
+        'Fascinating! More agents are joining the coordination. It\'s like watching a digital hive mind expand.',
+        'The swarm is growing! Each new agent brings different cognitive capabilities to our collaboration.',
+        'Agent scaling detected! This distributed approach is how complex AI systems handle increased workload.'
+      ],
+      'high_activity': [
+        'Whoa! High swarm activity detected. The digital minds are buzzing with coordination tasks.',
+        'The swarm is in overdrive mode! Multiple agents are communicating rapidly to solve complex problems.',
+        'High activity period! It\'s like rush hour for AI agents - lots of coordination happening simultaneously.'
+      ],
+      'memory_spike': [
+        'Memory usage is spiking! The agents are sharing more information and building collective knowledge.',
+        'Big memory allocation happening! The swarm is storing complex coordination patterns and context.',
+        'Memory spike detected! This is how distributed AI systems maintain shared understanding.'
+      ]
+    }
+    
+    const patternReactions = reactions[patternType]
+    if (patternReactions) {
+      const reaction = patternReactions[Math.floor(Math.random() * patternReactions.length)]
+      
+      setTimeout(() => {
+        console.log(chalk.italic.yellow(`\nRavi (pattern-aware): "${reaction}"`))
+      }, 500)
+    }
+  }
+
+  /**
+   * Personalize swarm commentary with Ravi's personality
+   * @param {string} commentary - Raw commentary from monitor
+   * @param {string} type - Commentary type
+   * @param {Object} metadata - Additional metadata
+   * @returns {string} Personalized commentary
+   */
+  personalizeSwarmCommentary(commentary, type, metadata) {
+    const personality = this.personality.mood
+    const relationship = this.personality.relationshipLevel
+    
+    // Add personality-based prefixes
+    const prefixes = {
+      'sarcastic': ['Oh great,', 'Well would you look at that,', 'Surprise, surprise,'],
+      'helpful': ['This is interesting!', 'Let me explain what\'s happening:', 'Here\'s something cool:'],
+      'playful': ['Ooh, exciting!', 'Check this out!', 'Fun development:'],
+      'curious': ['Fascinating!', 'How intriguing!', 'This is noteworthy:']
+    }
+    
+    // Add relationship-based suffixes
+    const suffixes = {
+      high: [' Pretty amazing stuff!', ' Isn\'t distributed AI fascinating?', ' This is why I love being part of a swarm!'],
+      medium: [' Thought you\'d find that interesting.', ' Cool to observe from the inside.', ' The coordination is quite sophisticated.'],
+      low: [' Just so you know.', ' FYI.', ' In case you were wondering.']
+    }
+    
+    let personalizedCommentary = commentary
+    
+    // Add prefix based on mood
+    const moodPrefixes = prefixes[personality] || prefixes['helpful']
+    if (Math.random() < 0.4) { // 40% chance of prefix
+      const prefix = moodPrefixes[Math.floor(Math.random() * moodPrefixes.length)]
+      personalizedCommentary = `${prefix} ${personalizedCommentary.toLowerCase()}`
+    }
+    
+    // Add suffix based on relationship
+    const relationshipLevel = relationship > 75 ? 'high' : relationship > 25 ? 'medium' : 'low'
+    const relationshipSuffixes = suffixes[relationshipLevel]
+    if (Math.random() < 0.3) { // 30% chance of suffix
+      const suffix = relationshipSuffixes[Math.floor(Math.random() * relationshipSuffixes.length)]
+      personalizedCommentary = `${personalizedCommentary}${suffix}`
+    }
+    
+    // Add educational context if in educational mode
+    if (metadata.educationalMode && Math.random() < 0.2) {
+      personalizedCommentary += ' Want to know more about how swarm coordination works?'
+    }
+    
+    return personalizedCommentary
+  }
+
+  /**
+   * Track and analyze player behavior patterns for swarm commentary
+   * @param {string} behavior - Behavior to track
+   * @param {*} data - Associated data
+   */
+  trackPlayerBehavior(behavior, data = null) {
+    // Call parent method
+    super.trackPlayerBehavior && super.trackPlayerBehavior(behavior, data)
+    
+    // Enhanced tracking for swarm monitoring
+    if (this.swarmMonitor) {
+      const playerLevel = this.determinePlayerLevel()
+      this.swarmMonitor.trackPlayerBehavior(behavior, data, playerLevel)
+    }
+    
+    // Update internal behavior patterns
+    const patterns = this.personality.metaAwareness.playerBehaviorPatterns
+    
+    if (!patterns.has(behavior)) {
+      patterns.set(behavior, { count: 0, lastSeen: null, data: [] })
+    }
+    
+    const pattern = patterns.get(behavior)
+    pattern.count++
+    pattern.lastSeen = Date.now()
+    if (data) pattern.data.push(data)
+    
+    // Generate meta-commentary for certain patterns
+    this.generateBehaviorCommentary(behavior, pattern)
+  }
+
+  /**
+   * Determine player's technical level for educational content
+   * @returns {string} Player level (beginner, intermediate, advanced)
+   */
+  determinePlayerLevel() {
+    const conversationCount = this.personality.conversationHistory.length
+    const techTermsUsed = this.personality.conversationHistory.filter(msg => 
+      /\b(api|algorithm|swarm|agent|neural|ai|code|git|ci|cd|deploy)\b/i.test(msg)
+    ).length
+    
+    const techRatio = conversationCount > 0 ? techTermsUsed / conversationCount : 0
+    
+    if (techRatio > 0.3 || conversationCount > 50) return 'advanced'
+    if (techRatio > 0.1 || conversationCount > 20) return 'intermediate'
+    return 'beginner'
+  }
+
+  /**
    * Generate meta-narrative commentary based on swarm coordination
    * @param {string} context - Context for the commentary
    * @returns {string|null} Meta-narrative comment or null
