@@ -895,6 +895,60 @@ Claude Flow extends the base coordination with:
 - **🔄 Workflow Automation** - Reusable task sequences
 - **🛡️ Enhanced Security** - Safer command execution
 
+## 🚀 SPARC Methodology Integration
+
+### SPARC Slash Commands
+
+Use these Claude Code slash commands to implement the SPARC methodology:
+
+**S - Specification:**
+- `/spec` - Create detailed specification from requirements
+- `/requirements` - Analyze and document requirements
+- `/acceptance` - Define acceptance criteria
+
+**P - Pseudocode:**
+- `/pseudo` - Generate pseudocode from specifications
+- `/algorithm` - Create algorithmic outlines
+- `/logic` - Design logical flow structures
+
+**A - Architecture:**
+- `/arch` - Design system architecture
+- `/design` - Create design patterns and structure
+- `/components` - Define component relationships
+
+**R - Refinement:**
+- `/refine` - Refine and optimize existing code
+- `/review` - Conduct code review and improvements
+- `/optimize` - Performance and quality optimization
+
+**C - Completion:**
+- `/implement` - Complete implementation from design
+- `/test` - Generate comprehensive tests
+- `/deploy` - Deployment and integration tasks
+
+### SPARC with Claude Flow Integration
+
+Combine SPARC methodology with Claude Flow swarm coordination:
+
+```bash
+# Initialize swarm with SPARC mode
+mcp__claude-flow__sparc_mode --mode spec --task-description "Create user authentication system"
+
+# Progress through SPARC phases with swarm coordination
+mcp__claude-flow__sparc_mode --mode pseudo --task-description "Design auth flow pseudocode"
+mcp__claude-flow__sparc_mode --mode arch --task-description "Architecture for auth system"
+mcp__claude-flow__sparc_mode --mode refine --task-description "Refine auth implementation"
+mcp__claude-flow__sparc_mode --mode api --task-description "Complete auth API implementation"
+```
+
+### SPARC Best Practices
+
+1. **Sequential SPARC Phases** - Complete each phase before moving to next
+2. **Swarm Coordination** - Use multiple agents for complex SPARC phases
+3. **Documentation** - Document decisions at each SPARC phase
+4. **Testing Integration** - Include testing in every SPARC phase
+5. **Iterative Refinement** - Use R phase for continuous improvement
+
 ## Support
 
 - Documentation: https://github.com/ruvnet/claude-flow
