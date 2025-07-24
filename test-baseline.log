@@ -1,0 +1,1021 @@
+
+> ravis-adventure@1.0.0 test
+> jest
+
+FAIL tests/save-load.test.js
+  Save/Load System
+    Basic Save Functionality
+      ✓ should save game state successfully (1 ms)
+      ✓ should include all relevant game state in save
+      ✓ should handle saving empty/minimal state (1 ms)
+    Basic Load Functionality
+      ✕ should load saved game state successfully
+      ✕ should restore complex game state accurately (1 ms)
+      ✓ should handle loading non-existent save gracefully (1 ms)
+    Save/Load Cycle Integrity
+      ✕ should maintain data integrity through multiple save/load cycles
+      ✓ should handle rapid save/load operations (2 ms)
+      ✓ should preserve character state through saves
+    Save File Management
+      ✕ should handle different save file names (1 ms)
+      ✕ should overwrite existing saves
+      ✕ should handle save file corruption gracefully
+    Data Validation
+      ✓ should validate save data structure
+      ✓ should handle invalid state data gracefully
+      ✕ should preserve data types correctly
+    Performance and Scalability
+      ✕ should handle large save files efficiently (1 ms)
+      ✕ should maintain performance with multiple saves
+    Edge Cases and Error Recovery
+      ✓ should handle concurrent save/load operations
+      ✓ should recover from interrupted save operations
+      ✕ should handle saves with special characters
+
+  ● Save/Load System › Basic Load Functionality › should load saved game state successfully
+
+    Save file not found
+
+      183 |       return Promise.resolve()
+      184 |     }
+    > 185 |     throw new Error('Save file not found')
+          |           ^
+      186 |   }
+      187 |   
+      188 |   async resetGame() {
+
+      at MockGameEngine.loadGame (tests/mocks/game-engine.mock.js:185:11)
+      at Object.loadGame (tests/save-load.test.js:110:24)
+
+  ● Save/Load System › Basic Load Functionality › should restore complex game state accurately
+
+    Save file not found
+
+      183 |       return Promise.resolve()
+      184 |     }
+    > 185 |     throw new Error('Save file not found')
+          |           ^
+      186 |   }
+      187 |   
+      188 |   async resetGame() {
+
+      at MockGameEngine.loadGame (tests/mocks/game-engine.mock.js:185:11)
+      at Object.loadGame (tests/save-load.test.js:156:24)
+
+  ● Save/Load System › Save/Load Cycle Integrity › should maintain data integrity through multiple save/load cycles
+
+    Save file not found
+
+      183 |       return Promise.resolve()
+      184 |     }
+    > 185 |     throw new Error('Save file not found')
+          |           ^
+      186 |   }
+      187 |   
+      188 |   async resetGame() {
+
+      at MockGameEngine.loadGame (tests/mocks/game-engine.mock.js:185:11)
+      at Object.loadGame (tests/save-load.test.js:189:26)
+
+  ● Save/Load System › Save File Management › should handle different save file names
+
+    Save file not found
+
+      183 |       return Promise.resolve()
+      184 |     }
+    > 185 |     throw new Error('Save file not found')
+          |           ^
+      186 |   }
+      187 |   
+      188 |   async resetGame() {
+
+      at MockGameEngine.loadGame (tests/mocks/game-engine.mock.js:185:11)
+      at Object.loadGame (tests/save-load.test.js:263:26)
+
+  ● Save/Load System › Save File Management › should overwrite existing saves
+
+    Save file not found
+
+      183 |       return Promise.resolve()
+      184 |     }
+    > 185 |     throw new Error('Save file not found')
+          |           ^
+      186 |   }
+      187 |   
+      188 |   async resetGame() {
+
+      at MockGameEngine.loadGame (tests/mocks/game-engine.mock.js:185:11)
+      at Object.loadGame (tests/save-load.test.js:281:24)
+
+  ● Save/Load System › Save File Management › should handle save file corruption gracefully
+
+    expect(received).rejects.toThrow()
+
+    Received promise resolved instead of rejected
+    Resolved to value: undefined
+
+      294 |       
+      295 |       // Loading corrupted save should fail gracefully
+    > 296 |       await expect(gameEngine.loadGame('corrupted_save')).rejects.toThrow()
+          |             ^
+      297 |       
+      298 |       // Game should remain in a valid state
+      299 |       const state = gameEngine.getState()
+
+      at expect (node_modules/expect/build/index.js:113:15)
+      at Object.expect (tests/save-load.test.js:296:13)
+
+  ● Save/Load System › Data Validation › should preserve data types correctly
+
+    Save file not found
+
+      183 |       return Promise.resolve()
+      184 |     }
+    > 185 |     throw new Error('Save file not found')
+          |           ^
+      186 |   }
+      187 |   
+      188 |   async resetGame() {
+
+      at MockGameEngine.loadGame (tests/mocks/game-engine.mock.js:185:11)
+      at Object.loadGame (tests/save-load.test.js:376:24)
+
+  ● Save/Load System › Performance and Scalability › should handle large save files efficiently
+
+    Save file not found
+
+      183 |       return Promise.resolve()
+      184 |     }
+    > 185 |     throw new Error('Save file not found')
+          |           ^
+      186 |   }
+      187 |   
+      188 |   async resetGame() {
+
+      at MockGameEngine.loadGame (tests/mocks/game-engine.mock.js:185:11)
+      at Object.loadGame (tests/save-load.test.js:409:24)
+
+  ● Save/Load System › Performance and Scalability › should maintain performance with multiple saves
+
+    expect(received).toBeLessThan(expected)
+
+    Expected: < 0
+    Received:   0
+
+      439 |       
+      440 |       // Second half shouldn't be much slower than first half
+    > 441 |       expect(avgSecond).toBeLessThan(avgFirst * 3)
+          |                         ^
+      442 |     })
+      443 |   })
+      444 |   
+
+      at Object.toBeLessThan (tests/save-load.test.js:441:25)
+
+  ● Save/Load System › Edge Cases and Error Recovery › should handle saves with special characters
+
+    Save file not found
+
+      183 |       return Promise.resolve()
+      184 |     }
+    > 185 |     throw new Error('Save file not found')
+          |           ^
+      186 |   }
+      187 |   
+      188 |   async resetGame() {
+
+      at MockGameEngine.loadGame (tests/mocks/game-engine.mock.js:185:11)
+      at Object.loadGame (tests/save-load.test.js:487:24)
+
+FAIL tests/story-engine.test.js
+  Story Engine Narrative Flow
+    Scene Navigation
+      ✓ should start at intro scene
+      ✓ should get current chapter (1 ms)
+      ✓ should navigate to specific scene
+      ✓ should handle invalid navigation
+      ✓ should unlock scenes when navigated to
+    Choice System
+      ✓ should make valid choice
+      ✓ should handle invalid choice
+      ✓ should record choice in history (1 ms)
+      ✕ should apply consequences of choices
+      ✕ should set story flags
+    Available Choices
+      ✓ should get available choices for current scene
+      ✓ should filter choices based on conditions
+      ✓ should handle scene with no choices
+    Prerequisites and Access Control
+      ✓ should check scene accessibility
+      ✓ should deny access to scenes with unmet prerequisites (1 ms)
+      ✓ should grant access after meeting prerequisites
+    Story State Management
+      ✓ should get complete story state
+      ✓ should set story state
+      ✓ should preserve existing state when setting partial state (1 ms)
+    Character Relationships
+      ✕ should track relationship changes
+      ✓ should enforce relationship bounds
+    Story Flags
+      ✕ should set and check story flags
+      ✓ should persist flags across choices (1 ms)
+    Branching Path Analysis
+      ✕ should analyze possible branching paths
+      ✕ should find all reachable scenes
+    Choice History
+      ✓ should maintain chronological choice history
+      ✓ should include scene context in choice history
+    Story Reset
+      ✓ should reset story to initial state (1 ms)
+      ✓ should return to intro scene after reset
+    Edge Cases
+      ✓ should handle missing scene gracefully
+      ✓ should handle choice when no current scene
+      ✓ should handle malformed consequences (1 ms)
+    Performance Tests
+      ✓ should handle large choice history efficiently
+      ✕ should analyze branching paths efficiently
+
+  ● Story Engine Narrative Flow › Choice System › should apply consequences of choices
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 10
+    Received: undefined
+
+      384 |       
+      385 |       const state = storyEngine.getStoryState()
+    > 386 |       expect(state.characterRelationships.ravi).toBe(10)
+          |                                                 ^
+      387 |     })
+      388 |     
+      389 |     test('should set story flags', () => {
+
+      at Object.toBe (tests/story-engine.test.js:386:49)
+
+  ● Story Engine Narrative Flow › Choice System › should set story flags
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      391 |       
+      392 |       const state = storyEngine.getStoryState()
+    > 393 |       expect(state.storyFlags.has('friendly_player')).toBe(true)
+          |                                                       ^
+      394 |     })
+      395 |   })
+      396 |   
+
+      at Object.toBe (tests/story-engine.test.js:393:55)
+
+  ● Story Engine Narrative Flow › Character Relationships › should track relationship changes
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 10
+    Received: undefined
+
+      488 |       
+      489 |       const state = storyEngine.getStoryState()
+    > 490 |       expect(state.characterRelationships.ravi).toBe(10)
+          |                                                 ^
+      491 |       
+      492 |       storyEngine.makeChoice('continue')
+      493 |       storyEngine.makeChoice('be_sarcastic') // If this were possible
+
+      at Object.toBe (tests/story-engine.test.js:490:49)
+
+  ● Story Engine Narrative Flow › Story Flags › should set and check story flags
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      518 |       
+      519 |       const state = storyEngine.getStoryState()
+    > 520 |       expect(state.storyFlags.has('friendly_player')).toBe(true)
+          |                                                       ^
+      521 |       expect(state.storyFlags.has('sarcastic_player')).toBe(false)
+      522 |     })
+      523 |     
+
+      at Object.toBe (tests/story-engine.test.js:520:55)
+
+  ● Story Engine Narrative Flow › Branching Path Analysis › should analyze possible branching paths
+
+    expect(received).toBeGreaterThan(expected)
+
+    Expected: > 0
+    Received:   0
+
+      536 |       
+      537 |       expect(Array.isArray(paths)).toBe(true)
+    > 538 |       expect(paths.length).toBeGreaterThan(0)
+          |                            ^
+      539 |       
+      540 |       // Should find multiple paths through the story
+      541 |       expect(paths.some(path => path.includes('intro_2'))).toBe(true)
+
+      at Object.toBeGreaterThan (tests/story-engine.test.js:538:28)
+
+  ● Story Engine Narrative Flow › Branching Path Analysis › should find all reachable scenes
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      551 |       })
+      552 |       
+    > 553 |       expect(allScenes.has('intro_1')).toBe(true)
+          |                                        ^
+      554 |       expect(allScenes.has('intro_2')).toBe(true)
+      555 |       expect(allScenes.has('intro_3')).toBe(true)
+      556 |     })
+
+      at Object.toBe (tests/story-engine.test.js:553:40)
+
+  ● Story Engine Narrative Flow › Performance Tests › should analyze branching paths efficiently
+
+    expect(received).toBeGreaterThan(expected)
+
+    Expected: > 0
+    Received:   0
+
+      663 |       
+      664 |       expect(endTime - startTime).toBeLessThan(100)
+    > 665 |       expect(paths.length).toBeGreaterThan(0)
+          |                            ^
+      666 |     })
+      667 |   })
+      668 | })
+
+      at Object.toBeGreaterThan (tests/story-engine.test.js:665:28)
+
+FAIL tests/cross-platform.test.js
+  Cross-Platform Compatibility
+    Operating System Compatibility
+      ✓ should detect current platform correctly
+      ✓ should handle different path separators (1 ms)
+      ✓ should handle different line endings
+    Node.js Version Compatibility
+      ✓ should run on supported Node.js versions
+      ✓ should handle different JavaScript engine features
+      ✓ should use appropriate APIs for the environment
+    Terminal Compatibility
+      ✓ should handle different terminal capabilities (553 ms)
+      ✓ should handle different console widths gracefully (838 ms)
+      ✓ should work without color support (223 ms)
+    File System Compatibility
+      ✓ should handle different file permissions (1 ms)
+      ✓ should handle different filesystem types (1 ms)
+    Memory and Resource Limits
+      ✓ should respect system memory limits
+      ✓ should handle low memory conditions gracefully (1 ms)
+      ✓ should handle CPU limitations (1 ms)
+    Network and Connectivity
+      ✓ should handle offline operation (1 ms)
+      ✓ should handle network timeouts gracefully (101 ms)
+    Character Encoding
+      ✓ should handle different character encodings (2 ms)
+      ✓ should handle different locale settings (11 ms)
+    Environment Variables
+      ✓ should handle missing environment variables (1 ms)
+      ✕ should respect debug environment variables (2 ms)
+    Performance Across Platforms
+      ✓ should maintain consistent performance
+      ✓ should scale with system capabilities (1 ms)
+    Error Handling Across Platforms
+      ✓ should handle platform-specific errors
+      ✓ should provide platform-appropriate error messages
+
+  ● Cross-Platform Compatibility › Environment Variables › should respect debug environment variables
+
+    Hooks cannot be defined inside tests. Hook of type "beforeEach" is nested within "should respect debug environment variables".
+
+      148 |
+      149 | // Test environment setup
+    > 150 | beforeEach(() => {
+          | ^
+      151 |   // Clear all mocks before each test
+      152 |   jest.clearAllMocks()
+      153 |   
+
+      at eventHandler (node_modules/jest-circus/build/eventHandler.js:97:11)
+      at Object.beforeEach (tests/setup.js:150:1)
+      at require (tests/cross-platform.test.js:421:13)
+      at Object.<anonymous> (node_modules/expect/build/toThrowMatchers.js:74:11)
+      at Object.throwingMatcher [as toThrow] (node_modules/expect/build/index.js:320:21)
+      at toThrow (tests/cross-platform.test.js:422:18)
+          at Array.forEach (<anonymous>)
+      at Object.forEach (tests/cross-platform.test.js:413:19)
+
+  ● Cross-Platform Compatibility › Environment Variables › should respect debug environment variables
+
+    Hooks cannot be defined inside tests. Hook of type "afterEach" is nested within "should respect debug environment variables".
+
+      156 | })
+      157 |
+    > 158 | afterEach(() => {
+          | ^
+      159 |   // Clean up any test artifacts
+      160 |   jest.restoreAllMocks()
+      161 | })
+
+      at eventHandler (node_modules/jest-circus/build/eventHandler.js:97:11)
+      at Object.afterEach (tests/setup.js:158:1)
+      at require (tests/cross-platform.test.js:421:13)
+      at Object.<anonymous> (node_modules/expect/build/toThrowMatchers.js:74:11)
+      at Object.throwingMatcher [as toThrow] (node_modules/expect/build/index.js:320:21)
+      at toThrow (tests/cross-platform.test.js:422:18)
+          at Array.forEach (<anonymous>)
+      at Object.forEach (tests/cross-platform.test.js:413:19)
+
+  ● Cross-Platform Compatibility › Environment Variables › should respect debug environment variables
+
+    Hooks cannot be defined inside tests. Hook of type "beforeEach" is nested within "should respect debug environment variables".
+
+      169 | const testStartTimes = new Map()
+      170 |
+    > 171 | beforeEach(() => {
+          | ^
+      172 |   const testName = expect.getState().currentTestName
+      173 |   testStartTimes.set(testName, Date.now())
+      174 | })
+
+      at eventHandler (node_modules/jest-circus/build/eventHandler.js:97:11)
+      at Object.beforeEach (tests/setup.js:171:1)
+      at require (tests/cross-platform.test.js:421:13)
+      at Object.<anonymous> (node_modules/expect/build/toThrowMatchers.js:74:11)
+      at Object.throwingMatcher [as toThrow] (node_modules/expect/build/index.js:320:21)
+      at toThrow (tests/cross-platform.test.js:422:18)
+          at Array.forEach (<anonymous>)
+      at Object.forEach (tests/cross-platform.test.js:413:19)
+
+  ● Cross-Platform Compatibility › Environment Variables › should respect debug environment variables
+
+    Hooks cannot be defined inside tests. Hook of type "afterEach" is nested within "should respect debug environment variables".
+
+      174 | })
+      175 |
+    > 176 | afterEach(() => {
+          | ^
+      177 |   const testName = expect.getState().currentTestName
+      178 |   const startTime = testStartTimes.get(testName)
+      179 |   if (startTime) {
+
+      at eventHandler (node_modules/jest-circus/build/eventHandler.js:97:11)
+      at Object.afterEach (tests/setup.js:176:1)
+      at require (tests/cross-platform.test.js:421:13)
+      at Object.<anonymous> (node_modules/expect/build/toThrowMatchers.js:74:11)
+      at Object.throwingMatcher [as toThrow] (node_modules/expect/build/index.js:320:21)
+      at toThrow (tests/cross-platform.test.js:422:18)
+          at Array.forEach (<anonymous>)
+      at Object.forEach (tests/cross-platform.test.js:413:19)
+
+FAIL tests/e2e.test.js
+  End-to-End User Experience
+    Complete Game Session
+      ✓ should handle full gameplay session from start to save (1 ms)
+      ✓ should handle player mistakes and recovery
+      ✕ should maintain consistency across session
+    Multi-Session Continuity
+      ✕ should maintain continuity across save/load cycles (1 ms)
+      ✕ should handle multiple save slots
+    Character Development
+      ✓ should show character growth throughout session (1 ms)
+      ✕ should remember character knowledge
+    Performance Under Load
+      ✓ should handle extended gameplay session (1 ms)
+      ✓ should handle rapid user input (4 ms)
+    User Experience Edge Cases
+      ✓ should handle empty or whitespace commands (1 ms)
+      ✓ should handle very long input gracefully
+      ✓ should handle special characters in commands
+    Accessibility and Usability
+      ✓ should provide helpful error messages (1 ms)
+      ✓ should maintain consistent response format
+    Data Integrity
+      ✓ should maintain data integrity throughout session
+      ✓ should handle concurrent state access safely (1 ms)
+
+  ● End-to-End User Experience › Complete Game Session › should maintain consistency across session
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "living room"
+    Received string:    "You go south to the Living Room."
+
+      100 |           testUtils.createMockCommand(action.command, action.args)
+      101 |         )
+    > 102 |         expect(response).toContain(action.expected)
+          |                          ^
+      103 |       }
+      104 |       
+      105 |       // Verify final state consistency
+
+      at Object.toContain (tests/e2e.test.js:102:26)
+
+  ● End-to-End User Experience › Multi-Session Continuity › should maintain continuity across save/load cycles
+
+    Save file not found
+
+      183 |       return Promise.resolve()
+      184 |     }
+    > 185 |     throw new Error('Save file not found')
+          |           ^
+      186 |   }
+      187 |   
+      188 |   async resetGame() {
+
+      at MockGameEngine.loadGame (tests/mocks/game-engine.mock.js:185:11)
+      at Object.loadGame (tests/e2e.test.js:129:24)
+
+  ● End-to-End User Experience › Multi-Session Continuity › should handle multiple save slots
+
+    Save file not found
+
+      183 |       return Promise.resolve()
+      184 |     }
+    > 185 |     throw new Error('Save file not found')
+          |           ^
+      186 |   }
+      187 |   
+      188 |   async resetGame() {
+
+      at MockGameEngine.loadGame (tests/mocks/game-engine.mock.js:185:11)
+      at Object.loadGame (tests/e2e.test.js:170:26)
+
+  ● End-to-End User Experience › Character Development › should remember character knowledge
+
+    Save file not found
+
+      183 |       return Promise.resolve()
+      184 |     }
+    > 185 |     throw new Error('Save file not found')
+          |           ^
+      186 |   }
+      187 |   
+      188 |   async resetGame() {
+
+      at MockGameEngine.loadGame (tests/mocks/game-engine.mock.js:185:11)
+      at Object.loadGame (tests/e2e.test.js:226:24)
+
+PASS tests/swarm-coordination.test.js
+  Swarm Coordination
+    Hook Integration
+      ✓ should execute pre-task hooks successfully (1 ms)
+      ✓ should execute post-edit hooks after state changes
+      ✓ should execute notification hooks for significant events
+      ✓ should execute post-task hooks on completion (1 ms)
+    Memory Coordination
+      ✓ should store game progress in swarm memory
+      ✓ should retrieve coordination context from memory
+      ✓ should coordinate between multiple game sessions
+    Agent Communication
+      ✓ should communicate game events to swarm agents
+      ✓ should receive guidance from analytical agents
+      ✓ should coordinate with testing agents for quality assurance (1 ms)
+    Performance Monitoring
+      ✓ should monitor game performance metrics
+      ✓ should detect performance bottlenecks
+    Adaptive Behavior
+      ✓ should adapt to player behavior patterns
+      ✓ should learn from player feedback
+    Error Handling and Recovery
+      ✓ should handle hook execution failures gracefully (2 ms)
+      ✓ should recover from swarm communication failures
+      ✓ should maintain game functionality without swarm (1 ms)
+    Data Synchronization
+      ✓ should synchronize game state with swarm memory
+      ✓ should handle concurrent access to shared state
+    Integration Testing
+      ✓ should integrate with full swarm workflow
+      ✓ should coordinate with external systems (1 ms)
+
+FAIL tests/integration.test.js
+  Integration: Complete Gameplay Flow
+    Game Initialization
+      ✓ should initialize complete game system (1 ms)
+      ✓ should start interactive mode successfully
+    Complete User Journey: New Player
+      ✓ should handle complete new player experience (1 ms)
+      ✕ should handle player making mistakes gracefully
+    Complete User Journey: Returning Player
+      ✕ should handle save and load cycle
+      ✓ should handle loading non-existent save gracefully (1 ms)
+    Ravi Integration
+      ✓ should have Ravi respond to all game events (1 ms)
+      ✓ should track Ravi's mood changes throughout gameplay
+    Command Parser Integration
+      ✓ should handle complex command sequences
+      ✓ should handle rapid command input (1 ms)
+    Error Recovery
+      ✕ should recover from invalid game states
+      ✓ should handle character disconnection
+    Performance Integration
+      ✓ should maintain performance during extended play (1 ms)
+      ✓ should handle concurrent operations (2 ms)
+    Swarm Coordination Integration
+      ✓ should coordinate with swarm hooks
+      ✓ should share game progress with swarm memory
+    Edge Cases in Integration
+      ✕ should handle rapid save/load cycles
+      ✓ should handle memory exhaustion gracefully (718 ms)
+      ✓ should maintain data integrity across operations
+
+  ● Integration: Complete Gameplay Flow › Complete User Journey: New Player › should handle player making mistakes gracefully
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      120 |       
+      121 |       // Game should still be functional
+    > 122 |       expect(gameEngine.getState().isRunning).toBe(true)
+          |                                               ^
+      123 |     })
+      124 |   })
+      125 |   
+
+      at Object.toBe (tests/integration.test.js:122:47)
+
+  ● Integration: Complete Gameplay Flow › Complete User Journey: Returning Player › should handle save and load cycle
+
+    Save file not found
+
+      183 |       return Promise.resolve()
+      184 |     }
+    > 185 |     throw new Error('Save file not found')
+          |           ^
+      186 |   }
+      187 |   
+      188 |   async resetGame() {
+
+      at MockGameEngine.loadGame (tests/mocks/game-engine.mock.js:185:11)
+      at Object.loadGame (tests/integration.test.js:142:24)
+
+  ● Integration: Complete Gameplay Flow › Error Recovery › should recover from invalid game states
+
+    TypeError: Cannot read properties of undefined (reading 'description')
+
+      113 |     switch (cmd) {
+      114 |     case 'look':
+    > 115 |       return this.getCurrentLocation().description
+          |                                       ^
+      116 |       
+      117 |     case 'go':
+      118 |       const direction = args[0]
+
+      at MockGameEngine.processCommand (tests/mocks/game-engine.mock.js:115:39)
+      at Object.processCommand (tests/integration.test.js:253:41)
+
+  ● Integration: Complete Gameplay Flow › Edge Cases in Integration › should handle rapid save/load cycles
+
+    Save file not found
+
+      183 |       return Promise.resolve()
+      184 |     }
+    > 185 |     throw new Error('Save file not found')
+          |           ^
+      186 |   }
+      187 |   
+      188 |   async resetGame() {
+
+      at MockGameEngine.loadGame (tests/mocks/game-engine.mock.js:185:11)
+      at Object.loadGame (tests/integration.test.js:382:28)
+
+FAIL tests/performance.test.js
+  Performance Testing
+    Command Processing Performance
+      ✓ should process commands within performance thresholds (1 ms)
+      ✓ should handle rapid command sequences efficiently (1 ms)
+      ✓ should maintain performance with complex game states (1 ms)
+    Memory Usage Performance
+      ✓ should not leak memory during normal gameplay (1 ms)
+      ✓ should handle large inventories efficiently (723 ms)
+      ✓ should efficiently manage Ravi knowledge base (149 ms)
+    Response Time Performance
+      ✓ should generate Ravi responses quickly (1 ms)
+      ✓ should handle mood changes efficiently (1 ms)
+      ✓ should scale well with relationship complexity (7 ms)
+    Save/Load Performance
+      ✓ should save game state efficiently (3 ms)
+      ✕ should load game state efficiently (1 ms)
+    Concurrent Operations Performance
+      ✓ should handle simultaneous operations efficiently (1 ms)
+      ✓ should maintain performance under load
+    Scaling Performance
+      ✕ should scale linearly with inventory size (6 ms)
+      ✓ should scale well with knowledge base size (27 ms)
+    Resource Cleanup Performance
+      ✓ should clean up resources efficiently on reset (297 ms)
+      ✓ should handle memory cleanup during garbage collection (133 ms)
+    Edge Case Performance
+      ✓ should handle edge case inputs efficiently (1 ms)
+      ✓ should maintain performance with corrupted state
+
+  ● Performance Testing › Save/Load Performance › should load game state efficiently
+
+    Save file not found
+
+      183 |       return Promise.resolve()
+      184 |     }
+    > 185 |     throw new Error('Save file not found')
+          |           ^
+      186 |   }
+      187 |   
+      188 |   async resetGame() {
+
+      at MockGameEngine.loadGame (tests/mocks/game-engine.mock.js:185:11)
+      at loadGame (tests/performance.test.js:184:26)
+      at GameTestHelpers.measurePerformance (tests/utils/test-helpers.js:168:7)
+      at Object.<anonymous> (tests/performance.test.js:182:23)
+
+  ● Performance Testing › Scaling Performance › should scale linearly with inventory size
+
+    expect(received).toBeLessThan(expected)
+
+    Expected: < NaN
+    Received:   Infinity
+
+      256 |       
+      257 |       // Ratios shouldn't increase dramatically (allowing for some variance)
+    > 258 |       expect(ratio2to3).toBeLessThan(ratio1to2 * 3)
+          |                         ^
+      259 |       expect(ratio3to4).toBeLessThan(ratio2to3 * 3)
+      260 |     })
+      261 |     
+
+      at Object.toBeLessThan (tests/performance.test.js:258:25)
+
+FAIL tests/command-parser.test.js
+  Command Parser Functionality
+    Basic Parsing
+      ✓ should parse simple command
+      ✓ should parse command with arguments (1 ms)
+      ✓ should parse command with multiple arguments
+      ✓ should handle case insensitive input
+      ✓ should trim whitespace
+      ✓ should handle multiple spaces between words
+    Command Aliases
+      ✓ should resolve single letter aliases (1 ms)
+      ✓ should resolve word aliases
+      ✓ should handle aliases with arguments
+    Directional Commands
+      ✓ should convert direction words to go commands
+      ✓ should handle directional aliases
+    Compound Commands
+      ✓ should handle "go to" commands
+      ✓ should handle "pick up" commands (1 ms)
+      ✓ should handle "talk to" commands
+    Command Validation
+      ✓ should validate known commands (1 ms)
+      ✓ should reject unknown commands
+      ✓ should mark valid commands in parse result
+      ✓ should mark invalid commands in parse result
+    Error Handling
+      ✕ should handle empty input
+      ✓ should handle whitespace-only input
+      ✓ should handle null input
+      ✓ should handle undefined input
+      ✓ should handle non-string input
+    Alias Management
+      ✓ should add new alias for valid command
+      ✓ should reject alias for invalid command
+      ✓ should remove existing alias
+      ✓ should handle removing non-existent alias
+      ✓ should get all aliases
+    Command Information
+      ✓ should get all valid commands
+      ✓ should return copy of valid commands array
+    Complex Input Scenarios
+      ✓ should handle quoted strings
+      ✓ should handle commands with punctuation
+      ✓ should handle very long input
+      ✓ should handle special characters
+    Performance Tests
+      ✓ should parse commands quickly (1 ms)
+      ✓ should handle command with many arguments efficiently
+    Edge Cases
+      ✓ should handle command with only spaces as arguments
+      ✓ should handle commands with tabs and newlines
+      ✓ should handle unicode characters (1 ms)
+      ✓ should handle numbers in arguments
+
+  ● Command Parser Functionality › Error Handling › should handle empty input
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "Empty command"
+    Received string:    "Invalid input"
+
+      296 |       expect(result.args).toEqual([])
+      297 |       expect(result.isValid).toBe(false)
+    > 298 |       expect(result.error).toContain('Empty command')
+          |                            ^
+      299 |     })
+      300 |     
+      301 |     test('should handle whitespace-only input', () => {
+
+      at Object.toContain (tests/command-parser.test.js:298:28)
+
+FAIL tests/cli.test.js (43.356 s)
+  CLI Interface
+    Command Line Argument Parsing
+      ✓ should show help when requested (191 ms)
+      ✓ should show version when requested (203 ms)
+      ✓ should start game normally without arguments (193 ms)
+    Interactive Mode
+      ✓ should handle basic commands in interactive mode (5002 ms)
+      ✕ should handle quit command gracefully (3008 ms)
+    File Operations
+      ✕ should handle save command (5003 ms)
+      ✕ should handle invalid commands gracefully (3006 ms)
+    Error Handling
+      ✕ should handle SIGINT gracefully (3003 ms)
+      ✕ should handle rapid input without crashing (5007 ms)
+    Cross-Platform Compatibility
+      ✕ should handle different line endings (3003 ms)
+      ✓ should work with different node versions (1 ms)
+    Output Formatting
+      ✕ should produce colored output when supported (256 ms)
+      ✓ should handle ASCII art display (211 ms)
+    Performance Tests
+      ✓ should start within reasonable time (198 ms)
+      ✕ should handle multiple simultaneous instances (5005 ms)
+    Memory Management
+      ✕ should not leak memory during normal operation (10002 ms)
+
+  ● CLI Interface › Interactive Mode › should handle quit command gracefully
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "room"
+    Received string:    "  ___             _  _        _       _                 _···················
+     | _ \\ __ _ __ __(_)( )___   /_\\   __| |__ __ ___  _ _ | |_  _  _  _ _  ___·
+     |   // _` |\\ V /| ||/(_-<  / _ \\ / _` |\\ V // -_)| ' \\|  _|| || || '_|/ -_)
+     |_|_\\\\__,_| \\_/ |_|  /__/ /_/ \\_\\\\__,_| \\_/ \\___||_||_|\\__| \\_,_||_|  \\___|·············································································
+    A hilarious CLI text adventure featuring Ravi and agentic swarm coding·
+    🎮 Welcome to a world where NPCs know they're NPCs!·
+    [32m?[39m [1mWhat should Ravi call you?[22m[0m [0m[2m(Player) [22m[38D[38C"
+
+      103 |       
+      104 |       child.on('close', () => {
+    > 105 |         expect(output).toContain('room') // Response to look command
+          |                        ^
+      106 |         done()
+      107 |       })
+      108 |       
+
+      at ChildProcess.toContain (tests/cli.test.js:105:24)
+
+  ● CLI Interface › File Operations › should handle save command
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: null
+
+      131 |       
+      132 |       child.on('close', (code) => {
+    > 133 |         expect(code).toBe(0) // Should exit cleanly
+          |                      ^
+      134 |         done()
+      135 |       })
+      136 |       
+
+      at ChildProcess.toBe (tests/cli.test.js:133:22)
+
+  ● CLI Interface › File Operations › should handle invalid commands gracefully
+
+    expect(received).toMatch(expected)
+
+    Expected pattern: /saved|progress/i
+    Received string:  "  ___             _  _        _       _                 _···················
+     | _ \\ __ _ __ __(_)( )___   /_\\   __| |__ __ ___  _ _ | |_  _  _  _ _  ___·
+     |   // _` |\\ V /| ||/(_-<  / _ \\ / _` |\\ V // -_)| ' \\|  _|| || || '_|/ -_)
+     |_|_\\\\__,_| \\_/ |_|  /__/ /_/ \\_\\\\__,_| \\_/ \\___||_||_|\\__| \\_,_||_|  \\___|·············································································
+    A hilarious CLI text adventure featuring Ravi and agentic swarm coding·
+    🎮 Welcome to a world where NPCs know they're NPCs!·
+    [32m?[39m [1mWhat should Ravi call you?[22m[0m [0m[2m(Player) [22m[38D[38C"
+
+      175 |       
+      176 |       child.on('close', async () => {
+    > 177 |         expect(output).toMatch(/saved|progress/i)
+          |                        ^
+      178 |         
+      179 |         // Check if save file was created
+      180 |         try {
+
+      at ChildProcess.toMatch (tests/cli.test.js:177:24)
+
+  ● CLI Interface › Error Handling › should handle SIGINT gracefully
+
+    expect(received).toMatch(expected)
+
+    Expected pattern: /understand|unknown|invalid/i
+    Received string:  "  ___             _  _        _       _                 _···················
+     | _ \\ __ _ __ __(_)( )___   /_\\   __| |__ __ ___  _ _ | |_  _  _  _ _  ___·
+     |   // _` |\\ V /| ||/(_-<  / _ \\ / _` |\\ V // -_)| ' \\|  _|| || || '_|/ -_)
+     |_|_\\\\__,_| \\_/ |_|  /__/ /_/ \\_\\\\__,_| \\_/ \\___||_||_|\\__| \\_,_||_|  \\___|·············································································
+    A hilarious CLI text adventure featuring Ravi and agentic swarm coding·
+    🎮 Welcome to a world where NPCs know they're NPCs!·
+    [32m?[39m [1mWhat should Ravi call you?[22m[0m [0m[2m(Player) [22m[38D[38C"
+
+      216 |       
+      217 |       child.on('close', () => {
+    > 218 |         expect(output).toMatch(/understand|unknown|invalid/i)
+          |                        ^
+      219 |         done()
+      220 |       })
+      221 |       
+
+      at ChildProcess.toMatch (tests/cli.test.js:218:24)
+
+  ● CLI Interface › Error Handling › should handle rapid input without crashing
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      246 |       child.on('close', (code, signal) => {
+      247 |         // Should handle interrupt gracefully
+    > 248 |         expect(signal === 'SIGINT' || code === 0).toBe(true)
+          |                                                   ^
+      249 |         done()
+      250 |       })
+      251 |       
+
+      at ChildProcess.toBe (tests/cli.test.js:248:51)
+
+  ● CLI Interface › Cross-Platform Compatibility › should handle different line endings
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: null
+
+      278 |       
+      279 |       child.on('close', (code) => {
+    > 280 |         expect(code).toBe(0) // Should not crash
+          |                      ^
+      281 |         done()
+      282 |       })
+      283 |       
+
+      at ChildProcess.toBe (tests/cli.test.js:280:22)
+
+  ● CLI Interface › Output Formatting › should produce colored output when supported
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: null
+
+      311 |       
+      312 |       child.on('close', (code) => {
+    > 313 |         expect(code).toBe(0)
+          |                      ^
+      314 |         expect(output).toMatch(/room|help/i)
+      315 |         done()
+      316 |       })
+
+      at ChildProcess.toBe (tests/cli.test.js:313:22)
+
+  ● CLI Interface › Performance Tests › should handle multiple simultaneous instances
+
+    Game did not start within timeout
+
+      413 |       setTimeout(() => {
+      414 |         child.kill()
+    > 415 |         done(new Error('Game did not start within timeout'))
+          |              ^
+      416 |       }, 5000)
+      417 |     }, testConstants.TIMEOUT.LONG)
+      418 |     
+
+      at Timeout._onTimeout (tests/cli.test.js:415:14)
+
+  ● CLI Interface › Memory Management › should not leak memory during normal operation
+
+    thrown: "Exceeded timeout of 10000 ms for a test while waiting for `done()` to be called.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      450 |   
+      451 |   describe('Memory Management', () => {
+    > 452 |     test('should not leak memory during normal operation', (done) => {
+          |     ^
+      453 |       const child = spawn('node', [gamePath], { 
+      454 |         stdio: ['pipe', 'pipe', 'pipe'] 
+      455 |       })
+
+      at test (tests/cli.test.js:452:5)
+      at describe (tests/cli.test.js:451:3)
+      at Object.describe (tests/cli.test.js:10:1)
+

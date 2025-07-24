@@ -3,18 +3,18 @@
  * QA Engineer: Testing swarm integration and coordination features
  */
 
-const MockGameEngine = require('./mocks/game-engine.mock');
-const MockRavi = require('./mocks/ravi.mock');
+const MockGameEngine = require('./mocks/game-engine.mock')
+const MockRavi = require('./mocks/ravi.mock')
 
 describe('Swarm Coordination', () => {
-  let gameEngine;
-  let ravi;
+  let gameEngine
+  let ravi
   
   beforeEach(() => {
-    gameEngine = new MockGameEngine();
-    ravi = new MockRavi(gameEngine);
-    gameEngine.setCharacter(ravi);
-  });
+    gameEngine = new MockGameEngine()
+    ravi = new MockRavi(gameEngine)
+    gameEngine.setCharacter(ravi)
+  })
   
   describe('Hook Integration', () => {
     test('should execute pre-task hooks successfully', async () => {
@@ -22,19 +22,19 @@ describe('Swarm Coordination', () => {
         task: 'test_gameplay_session',
         player: 'TestPlayer',
         location: 'living_room'
-      };
+      }
       
-      const result = await gameEngine.executeSwarmHook('pre-task', hookData);
+      const result = await gameEngine.executeSwarmHook('pre-task', hookData)
       
-      expect(result.success).toBe(true);
-      expect(result.hookType).toBe('pre-task');
-      expect(result.data).toEqual(hookData);
-    });
+      expect(result.success).toBe(true)
+      expect(result.hookType).toBe('pre-task')
+      expect(result.data).toEqual(hookData)
+    })
     
     test('should execute post-edit hooks after state changes', async () => {
       // Modify game state
-      gameEngine.moveToLocation('kitchen');
-      gameEngine.addToInventory('test_item');
+      gameEngine.moveToLocation('kitchen')
+      gameEngine.addToInventory('test_item')
       
       const hookData = {
         file: 'game-state.json',
@@ -43,14 +43,14 @@ describe('Swarm Coordination', () => {
           inventoryAdded: ['test_item']
         },
         timestamp: Date.now()
-      };
+      }
       
-      const result = await gameEngine.executeSwarmHook('post-edit', hookData);
+      const result = await gameEngine.executeSwarmHook('post-edit', hookData)
       
-      expect(result.success).toBe(true);
-      expect(result.hookType).toBe('post-edit');
-      expect(result.data.changes.location).toBe('kitchen');
-    });
+      expect(result.success).toBe(true)
+      expect(result.hookType).toBe('post-edit')
+      expect(result.data.changes.location).toBe('kitchen')
+    })
     
     test('should execute notification hooks for significant events', async () => {
       const eventData = {
@@ -58,14 +58,14 @@ describe('Swarm Coordination', () => {
         achievement: 'first_exploration',
         player: 'TestPlayer',
         timestamp: Date.now()
-      };
+      }
       
-      const result = await gameEngine.executeSwarmHook('notification', eventData);
+      const result = await gameEngine.executeSwarmHook('notification', eventData)
       
-      expect(result.success).toBe(true);
-      expect(result.data.type).toBe('achievement_unlocked');
-      expect(result.data.achievement).toBe('first_exploration');
-    });
+      expect(result.success).toBe(true)
+      expect(result.data.type).toBe('achievement_unlocked')
+      expect(result.data.achievement).toBe('first_exploration')
+    })
     
     test('should execute post-task hooks on completion', async () => {
       // Simulate task completion
@@ -76,23 +76,23 @@ describe('Swarm Coordination', () => {
         locationsVisited: ['living_room', 'kitchen', 'bedroom'],
         raviInteractions: 12,
         finalState: gameEngine.getState()
-      };
+      }
       
-      const result = await gameEngine.executeSwarmHook('post-task', taskData);
+      const result = await gameEngine.executeSwarmHook('post-task', taskData)
       
-      expect(result.success).toBe(true);
-      expect(result.data.commandsExecuted).toBe(45);
-      expect(result.data.raviInteractions).toBe(12);
-    });
-  });
+      expect(result.success).toBe(true)
+      expect(result.data.commandsExecuted).toBe(45)
+      expect(result.data.raviInteractions).toBe(12)
+    })
+  })
   
   describe('Memory Coordination', () => {
     test('should store game progress in swarm memory', async () => {
       // Simulate game progress
-      gameEngine.moveToLocation('bedroom');
-      gameEngine.addToInventory('diary');
-      ravi.adjustRelationship(15);
-      ravi.learnFact('player_found_diary');
+      gameEngine.moveToLocation('bedroom')
+      gameEngine.addToInventory('diary')
+      ravi.adjustRelationship(15)
+      ravi.learnFact('player_found_diary')
       
       const progressData = {
         sessionId: 'test_session_001',
@@ -104,28 +104,28 @@ describe('Swarm Coordination', () => {
           locationsExplored: 3,
           itemsCollected: 1
         }
-      };
+      }
       
-      const result = await gameEngine.executeSwarmHook('memory-store', progressData);
+      const result = await gameEngine.executeSwarmHook('memory-store', progressData)
       
-      expect(result.success).toBe(true);
-      expect(result.data.sessionId).toBe('test_session_001');
-      expect(result.data.gameState.currentLocation).toBe('bedroom');
-      expect(result.data.raviStats.relationship).toBe(65); // 50 + 15
-    });
+      expect(result.success).toBe(true)
+      expect(result.data.sessionId).toBe('test_session_001')
+      expect(result.data.gameState.currentLocation).toBe('bedroom')
+      expect(result.data.raviStats.relationship).toBe(65) // 50 + 15
+    })
     
     test('should retrieve coordination context from memory', async () => {
       const contextQuery = {
         sessionId: 'test_session_001',
         requestType: 'game_context',
         includePreviousSessions: false
-      };
+      }
       
-      const result = await gameEngine.executeSwarmHook('memory-retrieve', contextQuery);
+      const result = await gameEngine.executeSwarmHook('memory-retrieve', contextQuery)
       
-      expect(result.success).toBe(true);
-      expect(result.data.requestType).toBe('game_context');
-    });
+      expect(result.success).toBe(true)
+      expect(result.data.requestType).toBe('game_context')
+    })
     
     test('should coordinate between multiple game sessions', async () => {
       // Simulate multi-session coordination
@@ -138,14 +138,14 @@ describe('Swarm Coordination', () => {
           achievementsUnlocked: ['explorer', 'collector'],
           raviRelationshipTrend: 'improving'
         }
-      };
+      }
       
-      const result = await gameEngine.executeSwarmHook('session-coordination', sessionData);
+      const result = await gameEngine.executeSwarmHook('session-coordination', sessionData)
       
-      expect(result.success).toBe(true);
-      expect(result.data.crossSessionData.overallProgress).toBe(0.35);
-    });
-  });
+      expect(result.success).toBe(true)
+      expect(result.data.crossSessionData.overallProgress).toBe(0.35)
+    })
+  })
   
   describe('Agent Communication', () => {
     test('should communicate game events to swarm agents', async () => {
@@ -158,14 +158,14 @@ describe('Swarm Coordination', () => {
           triggerCommand: 'examine bookshelf',
           timestamp: Date.now()
         }
-      };
+      }
       
-      const result = await gameEngine.executeSwarmHook('agent-broadcast', gameEvent);
+      const result = await gameEngine.executeSwarmHook('agent-broadcast', gameEvent)
       
-      expect(result.success).toBe(true);
-      expect(result.data.type).toBe('location_discovered');
-      expect(result.data.location).toBe('secret_room');
-    });
+      expect(result.success).toBe(true)
+      expect(result.data.type).toBe('location_discovered')
+      expect(result.data.location).toBe('secret_room')
+    })
     
     test('should receive guidance from analytical agents', async () => {
       const analysisRequest = {
@@ -177,13 +177,13 @@ describe('Swarm Coordination', () => {
           raviCommunication: 'regular'
         },
         requestGuidance: true
-      };
+      }
       
-      const result = await gameEngine.executeSwarmHook('analysis-request', analysisRequest);
+      const result = await gameEngine.executeSwarmHook('analysis-request', analysisRequest)
       
-      expect(result.success).toBe(true);
-      expect(result.data.requestType).toBe('gameplay_analysis');
-    });
+      expect(result.success).toBe(true)
+      expect(result.data.requestType).toBe('gameplay_analysis')
+    })
     
     test('should coordinate with testing agents for quality assurance', async () => {
       const qaData = {
@@ -198,14 +198,14 @@ describe('Swarm Coordination', () => {
             cpuUtilization: 'low'
           }
         }
-      };
+      }
       
-      const result = await gameEngine.executeSwarmHook('qa-report', qaData);
+      const result = await gameEngine.executeSwarmHook('qa-report', qaData)
       
-      expect(result.success).toBe(true);
-      expect(result.data.testResults.errorsEncountered).toBe(0);
-    });
-  });
+      expect(result.success).toBe(true)
+      expect(result.data.testResults.errorsEncountered).toBe(0)
+    })
+  })
   
   describe('Performance Monitoring', () => {
     test('should monitor game performance metrics', async () => {
@@ -229,13 +229,13 @@ describe('Swarm Coordination', () => {
             responses: 45
           }
         }
-      };
+      }
       
-      const result = await gameEngine.executeSwarmHook('performance-monitor', performanceData);
+      const result = await gameEngine.executeSwarmHook('performance-monitor', performanceData)
       
-      expect(result.success).toBe(true);
-      expect(result.data.metrics.commandProcessingTime.average).toBe(3.2);
-    });
+      expect(result.success).toBe(true)
+      expect(result.data.metrics.commandProcessingTime.average).toBe(3.2)
+    })
     
     test('should detect performance bottlenecks', async () => {
       const bottleneckData = {
@@ -252,15 +252,15 @@ describe('Swarm Coordination', () => {
           'optimize_search_algorithm',
           'cache_frequent_lookups'
         ]
-      };
+      }
       
-      const result = await gameEngine.executeSwarmHook('bottleneck-detection', bottleneckData);
+      const result = await gameEngine.executeSwarmHook('bottleneck-detection', bottleneckData)
       
-      expect(result.success).toBe(true);
-      expect(result.data.severity).toBe('medium');
-      expect(result.data.suggestedOptimizations).toHaveLength(3);
-    });
-  });
+      expect(result.success).toBe(true)
+      expect(result.data.severity).toBe('medium')
+      expect(result.data.suggestedOptimizations).toHaveLength(3)
+    })
+  })
   
   describe('Adaptive Behavior', () => {
     test('should adapt to player behavior patterns', async () => {
@@ -277,14 +277,14 @@ describe('Swarm Coordination', () => {
           hintFrequency: 'reduced',
           itemPlacement: 'more_hidden_items'
         }
-      };
+      }
       
-      const result = await gameEngine.executeSwarmHook('behavior-adaptation', playerPattern);
+      const result = await gameEngine.executeSwarmHook('behavior-adaptation', playerPattern)
       
-      expect(result.success).toBe(true);
-      expect(result.data.playStyle).toBe('explorer');
-      expect(result.data.adaptationSuggestions.raviMoodAdjustment).toBe('more_encouraging');
-    });
+      expect(result.success).toBe(true)
+      expect(result.data.playStyle).toBe('explorer')
+      expect(result.data.adaptationSuggestions.raviMoodAdjustment).toBe('more_encouraging')
+    })
     
     test('should learn from player feedback', async () => {
       const feedbackData = {
@@ -303,14 +303,14 @@ describe('Swarm Coordination', () => {
           }
         },
         learningPriority: 'high'
-      };
+      }
       
-      const result = await gameEngine.executeSwarmHook('feedback-learning', feedbackData);
+      const result = await gameEngine.executeSwarmHook('feedback-learning', feedbackData)
       
-      expect(result.success).toBe(true);
-      expect(result.data.indicators.raviResponseRating.funny).toBe(0.8);
-    });
-  });
+      expect(result.success).toBe(true)
+      expect(result.data.indicators.raviResponseRating.funny).toBe(0.8)
+    })
+  })
   
   describe('Error Handling and Recovery', () => {
     test('should handle hook execution failures gracefully', async () => {
@@ -319,14 +319,14 @@ describe('Swarm Coordination', () => {
         malformedData: 'this should cause an error',
         nullReference: null,
         undefinedValue: undefined
-      };
+      }
       
       // Mock implementation should handle this gracefully
-      const result = await gameEngine.executeSwarmHook('invalid-hook', invalidHookData);
+      const result = await gameEngine.executeSwarmHook('invalid-hook', invalidHookData)
       
-      expect(result.success).toBe(true); // Mock always succeeds
-      expect(result.data).toBeDefined();
-    });
+      expect(result.success).toBe(true) // Mock always succeeds
+      expect(result.data).toBeDefined()
+    })
     
     test('should recover from swarm communication failures', async () => {
       const recoveryData = {
@@ -337,13 +337,13 @@ describe('Swarm Coordination', () => {
           { type: 'save_state', priority: 'high' },
           { type: 'log_metrics', priority: 'medium' }
         ]
-      };
+      }
       
-      const result = await gameEngine.executeSwarmHook('recovery-mode', recoveryData);
+      const result = await gameEngine.executeSwarmHook('recovery-mode', recoveryData)
       
-      expect(result.success).toBe(true);
-      expect(result.data.fallbackMode).toBe('local_operation');
-    });
+      expect(result.success).toBe(true)
+      expect(result.data.fallbackMode).toBe('local_operation')
+    })
     
     test('should maintain game functionality without swarm', async () => {
       // Test that game works even if swarm hooks fail
@@ -352,33 +352,33 @@ describe('Swarm Coordination', () => {
         testUtils.createMockCommand('go', ['north']),
         testUtils.createMockCommand('inventory'),
         testUtils.createMockCommand('take', ['coffee'])
-      ];
+      ]
       
       for (const command of commands) {
-        const response = await gameEngine.processCommand(command);
-        expect(response).toBeDefined();
-        expect(typeof response).toBe('string');
+        const response = await gameEngine.processCommand(command)
+        expect(response).toBeDefined()
+        expect(typeof response).toBe('string')
         
         // Try to execute hook (might fail, but game should continue)
         try {
           await gameEngine.executeSwarmHook('command-processed', {
             command: command.command,
             response: response
-          });
+          })
         } catch (error) {
           // Game should continue even if hook fails
-          expect(gameEngine.getState().isRunning).toBeDefined();
+          expect(gameEngine.getState().isRunning).toBeDefined()
         }
       }
-    });
-  });
+    })
+  })
   
   describe('Data Synchronization', () => {
     test('should synchronize game state with swarm memory', async () => {
       // Modify game state
-      gameEngine.moveToLocation('kitchen');
-      gameEngine.addToInventory('sync_test_item');
-      ravi.adjustRelationship(10);
+      gameEngine.moveToLocation('kitchen')
+      gameEngine.addToInventory('sync_test_item')
+      ravi.adjustRelationship(10)
       
       const syncData = {
         operation: 'sync_to_swarm',
@@ -390,34 +390,34 @@ describe('Swarm Coordination', () => {
         },
         timestamp: Date.now(),
         checksum: 'mock_checksum_abc123'
-      };
+      }
       
-      const result = await gameEngine.executeSwarmHook('state-sync', syncData);
+      const result = await gameEngine.executeSwarmHook('state-sync', syncData)
       
-      expect(result.success).toBe(true);
-      expect(result.data.gameState.currentLocation).toBe('kitchen');
-      expect(result.data.raviState.relationship).toBe(60);
-    });
+      expect(result.success).toBe(true)
+      expect(result.data.gameState.currentLocation).toBe('kitchen')
+      expect(result.data.raviState.relationship).toBe(60)
+    })
     
     test('should handle concurrent access to shared state', async () => {
       const concurrentOperations = [
         { operation: 'read_state', agent: 'agent_1' },
         { operation: 'update_metrics', agent: 'agent_2' },
         { operation: 'log_event', agent: 'agent_3' }
-      ];
+      ]
       
       const promises = concurrentOperations.map(op => 
         gameEngine.executeSwarmHook('concurrent-access', op)
-      );
+      )
       
-      const results = await Promise.all(promises);
+      const results = await Promise.all(promises)
       
       results.forEach((result, index) => {
-        expect(result.success).toBe(true);
-        expect(result.data.agent).toBe(concurrentOperations[index].agent);
-      });
-    });
-  });
+        expect(result.success).toBe(true)
+        expect(result.data.agent).toBe(concurrentOperations[index].agent)
+      })
+    })
+  })
   
   describe('Integration Testing', () => {
     test('should integrate with full swarm workflow', async () => {
@@ -428,21 +428,21 @@ describe('Swarm Coordination', () => {
         { hook: 'command-sequence', data: { commands: ['look', 'go north', 'take coffee'] } },
         { hook: 'progress-update', data: { location: 'kitchen', items: 1 } },
         { hook: 'post-task', data: { completed: true, duration: 300000 } }
-      ];
+      ]
       
-      const results = [];
+      const results = []
       for (const step of workflow) {
-        const result = await gameEngine.executeSwarmHook(step.hook, step.data);
-        results.push(result);
+        const result = await gameEngine.executeSwarmHook(step.hook, step.data)
+        results.push(result)
       }
       
       // All steps should complete successfully
       results.forEach(result => {
-        expect(result.success).toBe(true);
-      });
+        expect(result.success).toBe(true)
+      })
       
-      expect(results).toHaveLength(workflow.length);
-    });
+      expect(results).toHaveLength(workflow.length)
+    })
     
     test('should coordinate with external systems', async () => {
       const externalData = {
@@ -458,12 +458,12 @@ describe('Swarm Coordination', () => {
           }
         },
         authentication: 'mock_token_xyz789'
-      };
+      }
       
-      const result = await gameEngine.executeSwarmHook('external-integration', externalData);
+      const result = await gameEngine.executeSwarmHook('external-integration', externalData)
       
-      expect(result.success).toBe(true);
-      expect(result.data.system).toBe('analytics_service');
-    });
-  });
-});
+      expect(result.success).toBe(true)
+      expect(result.data.system).toBe('analytics_service')
+    })
+  })
+})
