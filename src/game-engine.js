@@ -6,6 +6,7 @@ const chalk = require('chalk')
 const CommandParser = require('./command-parser')
 const Ravi = require('./character/ravi')
 const StoryManager = require('./stories')
+const SwarmIntegration = require('./swarm-integration')
 
 class GameEngine extends EventEmitter {
   constructor() {
@@ -35,6 +36,11 @@ class GameEngine extends EventEmitter {
     this.commandParser = new CommandParser(this)
     this.ravi = new Ravi(this)
     this.storyManager = new StoryManager(this)
+    this.swarmIntegration = new SwarmIntegration(this, {
+      enableRealTimeMonitoring: true,
+      enableEducationalMode: process.env.RAVI_EDUCATIONAL_MODE === 'true',
+      enableDevelopmentAwareness: true
+    })
     this.rl = null
     this.autoSaveInterval = null
     
