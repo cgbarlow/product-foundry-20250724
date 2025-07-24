@@ -1,0 +1,14 @@
+{
+  "playerName": "",
+  "currentLocation": "start",
+  "inventory": [],
+  "stats": {
+    "health": 100,
+    "energy": 100,
+    "mood": "curious"
+  },
+  "gameTime": 0,
+  "achievements": [],
+  "storyFlags": {},
+  "lastSaved": "2025-07-23T23:49:45.823Z"
+}

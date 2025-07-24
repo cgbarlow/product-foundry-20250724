@@ -1,0 +1,50 @@
+{
+  "name": "ravis-adventure",
+  "version": "1.0.0",
+  "description": "A hilarious CLI text adventure game featuring Ravi and agentic swarm coding",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "lint": "eslint src/ tests/",
+    "lint:fix": "eslint src/ tests/ --fix",
+    "typecheck": "jsdoc -t templates/haruki -d docs src/",
+    "build": "npm run lint && npm run test",
+    "ci": "npm run build"
+  },
+  "bin": {
+    "ravis-adventure": "./src/index.js"
+  },
+  "keywords": [
+    "text-adventure",
+    "cli-game",
+    "interactive-fiction",
+    "humor",
+    "agentic-swarm",
+    "terminal-game"
+  ],
+  "author": "Agentic Swarm Collective",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "inquirer": "^9.2.12",
+    "commander": "^11.1.0",
+    "figlet": "^1.7.0",
+    "ora": "^8.0.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "eslint": "^8.57.0",
+    "eslint-config-standard": "^17.1.0",
+    "@types/jest": "^29.5.8"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/agentic-swarm/ravis-adventure.git"
+  }
+}
