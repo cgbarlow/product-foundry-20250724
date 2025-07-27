@@ -1,6 +1,6 @@
 {
   "isRunning": true,
-  "playerName": "",
+  "playerName": "Anonymous Adventurer",
   "currentLocation": "garden",
   "gameTime": 3,
   "inventory": [
@@ -14,7 +14,5 @@
   },
   "flags": {},
   "relationships": {},
-  "lastSaved": "2025-07-27T09:06:31.654Z",
-  "achievements": [],
-  "storyFlags": {}
+  "lastSaved": "2025-07-27T10:14:24.447Z"
 }
