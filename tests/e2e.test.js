@@ -1,10 +1,15 @@
 /**
  * End-to-End Test Suite - PRODUCTION CODE ONLY
  * Complete user experience testing with real implementations
+ * QA Engineer: Comprehensive E2E testing with zero mocks
  */
 
 const RealGameEngine = require('../src/real-game-engine')
 const CommandParserSync = require('../src/command-parser-sync')
+const GameEngine = require('../src/game-engine')
+const GameState = require('../src/game-state')
+const path = require('path')
+const fs = require('fs').promises
 
 // Test utilities
 const testUtils = {
@@ -14,77 +19,115 @@ const testUtils = {
   })
 }
 
-let gameEngine, commandParser
+let gameEngine, commandParser, gameState, realGameEngine
 
 beforeEach(async () => {
-  gameEngine = new RealGameEngine()
-  await gameEngine.initialize()
-  commandParser = new CommandParserSync(gameEngine)
+  // Test multiple game engine implementations
+  realGameEngine = new RealGameEngine()
+  await realGameEngine.initialize()
+  
+  gameEngine = new GameEngine()
+  gameState = new GameState()
+  await gameState.initialize()
+  
+  commandParser = new CommandParserSync(realGameEngine)
+  
+  // Clean up any existing save files
+  try {
+    await fs.unlink(path.join(__dirname, '..', 'save-game.json'))
+  } catch (error) {
+    // File doesn't exist, that's fine
+  }
 })
 
 afterEach(async () => {
-  if (gameEngine) {
-    gameEngine.stop()
+  if (realGameEngine) {
+    realGameEngine.stop()
+  }
+  if (gameEngine && gameEngine.quit) {
+    gameEngine.quit()
+  }
+  
+  // Clean up save files after each test
+  try {
+    await fs.unlink(path.join(__dirname, '..', 'save-game.json'))
+    await fs.unlink(path.join(__dirname, '..', '.ravi-save.json'))
+  } catch (error) {
+    // Files don't exist, that's fine
   }
 })
 
 describe('End-to-End User Experience', () => {
   describe('Complete Game Session', () => {
     test('should handle full gameplay session from start to save', async () => {
-      // Complete gameplay flow
-      expect(gameEngine.getState().isRunning).toBe(true)
+      // Complete gameplay flow with real game engine
+      expect(realGameEngine.getState().isRunning).toBe(true)
       
       // Look around and get oriented
-      let response = await gameEngine.processCommand(testUtils.createMockCommand('look'))
-      expect(response).toContain('digital')
+      let response = await realGameEngine.processCommand(testUtils.createMockCommand('look'))
+      expect(response).toContain('Starting Area')
+      
+      // Verify mysterious key is available at start location
+      const startLocation = realGameEngine.locations.start
+      expect(startLocation.items).toContain('mysterious key')
       
       // Take an item (use correct command format)
-      response = await gameEngine.processCommand(testUtils.createMockCommand('take', ['mysterious key']))
+      response = await realGameEngine.processCommand(testUtils.createMockCommand('take', ['mysterious key']))
       expect(response).toContain('took')
+      expect(realGameEngine.hasInInventory('mysterious key')).toBe(true)
       
       // Move around
-      response = await gameEngine.processCommand(testUtils.createMockCommand('go', ['home']))
-      expect(response).toContain('moved')
+      response = await realGameEngine.processCommand(testUtils.createMockCommand('go', ['home']))
+      expect(response).toContain('Home Base')
+      expect(realGameEngine.getState().currentLocation).toBe('home')
       
       // Save the game
-      response = await gameEngine.processCommand(testUtils.createMockCommand('save'))
+      response = await realGameEngine.processCommand(testUtils.createMockCommand('save'))
       expect(response).toContain('success')
+      
+      // Verify save file exists
+      const saveExists = await fs.access(path.join(__dirname, '..', 'save-game.json')).then(() => true).catch(() => false)
+      expect(saveExists).toBe(true)
     })
 
     test('should handle player mistakes and recovery', async () => {
       // Try invalid commands
-      let response = await gameEngine.processCommand(testUtils.createMockCommand('invalidcommand'))
+      let response = await realGameEngine.processCommand(testUtils.createMockCommand('invalidcommand'))
       expect(response).toContain('Unknown command')
       
       // Try invalid movement
-      response = await gameEngine.processCommand(testUtils.createMockCommand('go', ['nowhere']))
+      response = await realGameEngine.processCommand(testUtils.createMockCommand('go', ['nowhere']))
       expect(response).toContain("can't go")
       
       // Game should still be functional
-      expect(gameEngine.getState().isRunning).toBe(true)
+      expect(realGameEngine.getState().isRunning).toBe(true)
+      
+      // Verify we can still execute valid commands
+      response = await realGameEngine.processCommand(testUtils.createMockCommand('look'))
+      expect(response).toContain('Starting Area')
     })
 
     test('should maintain consistency across session', async () => {
       // Simulate a complex gameplay session with realistic expectations
       const actions = [
-        { command: 'look', args: [], expected: 'digital' },
+        { command: 'look', args: [], expected: 'Starting Area' },
         { command: 'take', args: ['mysterious key'], expected: 'took' },
-        { command: 'go', args: ['garden'], expected: 'moved' },
+        { command: 'go', args: ['garden'], expected: 'Digital Garden' },
         { command: 'take', args: ['digital flower'], expected: 'took' },
-        { command: 'go', args: ['start'], expected: 'moved' }
+        { command: 'go', args: ['start'], expected: 'Starting Area' }
       ]
       
       for (const action of actions) {
-        const response = await gameEngine.processCommand(
+        const response = await realGameEngine.processCommand(
           testUtils.createMockCommand(action.command, action.args)
         )
         expect(response).toContain(action.expected)
       }
       
       // Verify final state consistency
-      expect(gameEngine.hasInInventory('mysterious key')).toBe(true)
-      expect(gameEngine.hasInInventory('digital flower')).toBe(true)
-      expect(gameEngine.getCurrentLocation().key).toBe('start')
+      expect(realGameEngine.hasInInventory('mysterious key')).toBe(true)
+      expect(realGameEngine.hasInInventory('digital flower')).toBe(true)
+      expect(realGameEngine.getCurrentLocation().key).toBe('start')
     })
   })
 
