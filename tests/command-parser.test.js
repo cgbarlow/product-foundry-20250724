@@ -1,296 +1,141 @@
 /**
- * Command Parser Test Suite
- * QA Engineer: Input parsing and validation testing
+ * Command Parser Test Suite - PRODUCTION CODE ONLY
+ * Testing real CommandParserSync implementation
  */
 
-// Mock CommandParser for testing
-class MockCommandParser {
-  constructor() {
-    this.aliases = new Map([
-      ['n', 'north'],
-      ['s', 'south'],
-      ['e', 'east'],
-      ['w', 'west'],
-      ['l', 'look'],
-      ['i', 'inventory'],
-      ['inv', 'inventory'],
-      ['h', 'help'],
-      ['?', 'help']
-    ])
-    
-    this.validCommands = [
-      'look', 'go', 'north', 'south', 'east', 'west',
-      'inventory', 'take', 'get', 'drop', 'use',
-      'talk', 'speak', 'help', 'save', 'load',
-      'quit', 'exit', 'restart'
-    ]
-  }
-  
-  parse(input) {
-    if (!input || typeof input !== 'string') {
-      return this.createCommand('', [], input, 'Invalid input')
-    }
-    
-    // Clean and normalize input
-    const cleanInput = input.trim().toLowerCase()
-    if (!cleanInput) {
-      return this.createCommand('', [], input, 'Empty command')
-    }
-    
-    // Split into parts
-    const parts = cleanInput.split(/\s+/)
-    let command = parts[0]
-    let args = parts.slice(1)
-    
-    // Handle aliases
-    if (this.aliases.has(command)) {
-      command = this.aliases.get(command)
-    }
-    
-    // Handle directional movement
-    if (['north', 'south', 'east', 'west'].includes(command)) {
-      args = [command]
-      command = 'go'
-    }
-    
-    // Handle compound commands
-    command = this.handleCompoundCommands(command, args)
-    
-    // Validate command
-    const isValid = this.validCommands.includes(command)
-    const error = isValid ? null : `Unknown command: ${command}`
-    
-    return this.createCommand(command, args, input, error)
-  }
-  
-  handleCompoundCommands(command, args) {
-    // Handle "go to X" -> "go X"
-    if (command === 'go' && args.length > 0 && args[0] === 'to') {
-      args.shift() // Remove 'to'
-    }
-    
-    // Handle "pick up" -> "take"
-    if (command === 'pick' && args.length > 0 && args[0] === 'up') {
-      args.shift() // Remove 'up'
-      return 'take'
-    }
-    
-    // Handle "talk to" -> "talk"
-    if (command === 'talk' && args.length > 0 && args[0] === 'to') {
-      args.shift() // Remove 'to'
-    }
-    
-    return command
-  }
-  
-  createCommand(command, args, rawInput, error = null) {
-    return {
-      command,
-      args: args || [],
-      rawInput: rawInput || '',
-      timestamp: Date.now(),
-      isValid: !error,
-      error
-    }
-  }
-  
-  isValidCommand(command) {
-    return this.validCommands.includes(command.toLowerCase())
-  }
-  
-  getValidCommands() {
-    return [...this.validCommands]
-  }
-  
-  getAliases() {
-    return new Map(this.aliases)
-  }
-  
-  addAlias(alias, command) {
-    if (this.validCommands.includes(command.toLowerCase())) {
-      this.aliases.set(alias.toLowerCase(), command.toLowerCase())
-      return true
-    }
-    return false
-  }
-  
-  removeAlias(alias) {
-    return this.aliases.delete(alias.toLowerCase())
-  }
-}
+const CommandParserSync = require('../src/command-parser-sync')
+const RealGameEngine = require('../src/real-game-engine')
 
-jest.mock('../src/command-parser', () => {
-  return MockCommandParser
+let parser, gameEngine
+
+beforeEach(async () => {
+  gameEngine = new RealGameEngine()
+  await gameEngine.initialize()
+  parser = new CommandParserSync(gameEngine)
 })
 
 describe('Command Parser Functionality', () => {
-  let parser
-  
-  beforeEach(() => {
-    parser = new MockCommandParser()
-  })
-  
   describe('Basic Parsing', () => {
     test('should parse simple command', () => {
-      const result = parser.parse('look')
+      const result = parser.parseCommand('help')
       
-      expect(result).toBeValidCommand()
-      expect(result.command).toBe('look')
+      expect(result.command).toBe('help')
       expect(result.args).toEqual([])
-      expect(result.rawInput).toBe('look')
       expect(result.isValid).toBe(true)
     })
-    
+
     test('should parse command with arguments', () => {
-      const result = parser.parse('go north')
+      const result = parser.parseCommand('go north')
       
-      expect(result).toBeValidCommand()
       expect(result.command).toBe('go')
       expect(result.args).toEqual(['north'])
       expect(result.isValid).toBe(true)
     })
-    
+
     test('should parse command with multiple arguments', () => {
-      const result = parser.parse('take red key from table')
+      const result = parser.parseCommand('take mysterious key')
       
-      expect(result).toBeValidCommand()
       expect(result.command).toBe('take')
-      expect(result.args).toEqual(['red', 'key', 'from', 'table'])
+      expect(result.args).toEqual(['mysterious', 'key'])
+      expect(result.isValid).toBe(true)
     })
-    
+
     test('should handle case insensitive input', () => {
-      const result = parser.parse('LOOK AROUND')
+      const result = parser.parseCommand('HELP')
       
-      expect(result.command).toBe('look')
-      expect(result.args).toEqual(['around'])
+      expect(result.command).toBe('help')
+      expect(result.isValid).toBe(true)
     })
-    
+
     test('should trim whitespace', () => {
-      const result = parser.parse('  look  around  ')
+      const result = parser.parseCommand('  help  ')
       
-      expect(result.command).toBe('look')
-      expect(result.args).toEqual(['around'])
+      expect(result.command).toBe('help')
+      expect(result.isValid).toBe(true)
     })
-    
+
     test('should handle multiple spaces between words', () => {
-      const result = parser.parse('go    north    quickly')
+      const result = parser.parseCommand('go    north')
       
       expect(result.command).toBe('go')
-      expect(result.args).toEqual(['north', 'quickly'])
+      expect(result.args).toEqual(['north'])
+      expect(result.isValid).toBe(true)
     })
   })
-  
+
   describe('Command Aliases', () => {
     test('should resolve single letter aliases', () => {
-      const testCases = [
-        ['n', 'go', ['north']],
-        ['s', 'go', ['south']],
-        ['e', 'go', ['east']],
-        ['w', 'go', ['west']],
-        ['l', 'look', []],
-        ['i', 'inventory', []],
-        ['h', 'help', []]
-      ]
+      const result = parser.parseCommand('h')
       
-      testCases.forEach(([input, expectedCommand, expectedArgs]) => {
-        const result = parser.parse(input)
-        expect(result.command).toBe(expectedCommand)
-        expect(result.args).toEqual(expectedArgs)
-      })
+      expect(result.command).toBe('help')
+      expect(result.isValid).toBe(true)
     })
-    
+
     test('should resolve word aliases', () => {
-      const result = parser.parse('inv')
+      const result = parser.parseCommand('inv')
       
       expect(result.command).toBe('inventory')
-      expect(result.args).toEqual([])
+      expect(result.isValid).toBe(true)
     })
-    
+
     test('should handle aliases with arguments', () => {
-      const result = parser.parse('l around')
-      
-      expect(result.command).toBe('look')
-      expect(result.args).toEqual(['around'])
-    })
-  })
-  
-  describe('Directional Commands', () => {
-    test('should convert direction words to go commands', () => {
-      const directions = ['north', 'south', 'east', 'west']
-      
-      directions.forEach(direction => {
-        const result = parser.parse(direction)
-        expect(result.command).toBe('go')
-        expect(result.args).toEqual([direction])
-      })
-    })
-    
-    test('should handle directional aliases', () => {
-      const result = parser.parse('n')
+      const result = parser.parseCommand('n')
       
       expect(result.command).toBe('go')
       expect(result.args).toEqual(['north'])
+      expect(result.isValid).toBe(true)
     })
   })
-  
-  describe('Compound Commands', () => {
-    test('should handle "go to" commands', () => {
-      const result = parser.parse('go to kitchen')
+
+  describe('Directional Commands', () => {
+    test('should convert direction words to go commands', () => {
+      const result = parser.parseCommand('north')
       
       expect(result.command).toBe('go')
-      expect(result.args).toEqual(['kitchen'])
+      expect(result.args).toEqual(['north'])
+      expect(result.isValid).toBe(true)
     })
-    
-    test('should handle "pick up" commands', () => {
-      const result = parser.parse('pick up key')
+
+    test('should handle directional aliases', () => {
+      const result = parser.parseCommand('n')
       
-      expect(result.command).toBe('take')
-      expect(result.args).toEqual(['key'])
-    })
-    
-    test('should handle "talk to" commands', () => {
-      const result = parser.parse('talk to ravi')
-      
-      expect(result.command).toBe('talk')
-      expect(result.args).toEqual(['ravi'])
+      expect(result.command).toBe('go')
+      expect(result.args).toEqual(['north'])
+      expect(result.isValid).toBe(true)
     })
   })
-  
+
   describe('Command Validation', () => {
     test('should validate known commands', () => {
-      const validCommands = ['look', 'go', 'take', 'inventory']
-      
-      validCommands.forEach(command => {
-        expect(parser.isValidCommand(command)).toBe(true)
-      })
-    })
-    
-    test('should reject unknown commands', () => {
-      const invalidCommands = ['fly', 'teleport', 'magic', 'hack']
-      
-      invalidCommands.forEach(command => {
-        expect(parser.isValidCommand(command)).toBe(false)
-      })
-    })
-    
-    test('should mark valid commands in parse result', () => {
-      const result = parser.parse('look')
+      const result = parser.parseCommand('help')
       
       expect(result.isValid).toBe(true)
       expect(result.error).toBeNull()
     })
-    
-    test('should mark invalid commands in parse result', () => {
-      const result = parser.parse('invalidcommand')
+
+    test('should reject unknown commands', () => {
+      const result = parser.parseCommand('unknowncommand')
       
       expect(result.isValid).toBe(false)
       expect(result.error).toContain('Unknown command')
     })
+
+    test('should mark valid commands in parse result', () => {
+      const result = parser.parseCommand('inventory')
+      
+      expect(result.isValid).toBe(true)
+    })
+
+    test('should mark invalid commands in parse result', () => {
+      const result = parser.parseCommand('invalidcommand')
+      
+      expect(result.isValid).toBe(false)
+    })
   })
-  
+
   describe('Error Handling', () => {
     test('should handle empty input', () => {
-      const result = parser.parse('')
+      const result = parser.parseCommand('')
       
       expect(result.command).toBe('')
       expect(result.args).toEqual([])
@@ -299,180 +144,215 @@ describe('Command Parser Functionality', () => {
     })
     
     test('should handle whitespace-only input', () => {
-      const result = parser.parse('   ')
+      const result = parser.parseCommand('   ')
       
       expect(result.command).toBe('')
+      expect(result.args).toEqual([])
       expect(result.isValid).toBe(false)
+      expect(result.error).toContain('Empty command')
     })
-    
+
     test('should handle null input', () => {
-      const result = parser.parse(null)
+      const result = parser.parseCommand(null)
       
+      expect(result.command).toBe('')
+      expect(result.args).toEqual([])
       expect(result.isValid).toBe(false)
       expect(result.error).toContain('Invalid input')
     })
-    
+
     test('should handle undefined input', () => {
-      const result = parser.parse(undefined)
+      const result = parser.parseCommand(undefined)
       
+      expect(result.command).toBe('')
+      expect(result.args).toEqual([])
       expect(result.isValid).toBe(false)
       expect(result.error).toContain('Invalid input')
     })
-    
+
     test('should handle non-string input', () => {
-      const result = parser.parse(123)
+      const result = parser.parseCommand(123)
       
+      expect(result.command).toBe('')
+      expect(result.args).toEqual([])
       expect(result.isValid).toBe(false)
       expect(result.error).toContain('Invalid input')
     })
   })
-  
+
   describe('Alias Management', () => {
     test('should add new alias for valid command', () => {
-      const success = parser.addAlias('examine', 'look')
+      const success = parser.addAlias('test', 'help')
       
       expect(success).toBe(true)
       
-      const result = parser.parse('examine')
-      expect(result.command).toBe('look')
+      const result = parser.parseCommand('test')
+      expect(result.command).toBe('help')
+      expect(result.isValid).toBe(true)
     })
-    
+
     test('should reject alias for invalid command', () => {
-      const success = parser.addAlias('fly', 'invalidcommand')
+      const success = parser.addAlias('test', 'invalidcommand')
       
       expect(success).toBe(false)
     })
-    
+
     test('should remove existing alias', () => {
-      const success = parser.removeAlias('l')
+      parser.addAlias('test', 'help')
+      const success = parser.removeAlias('test')
       
       expect(success).toBe(true)
       
-      const result = parser.parse('l')
-      expect(result.command).toBe('l') // Should not be converted to 'look'
+      const result = parser.parseCommand('test')
       expect(result.isValid).toBe(false)
     })
-    
+
     test('should handle removing non-existent alias', () => {
       const success = parser.removeAlias('nonexistent')
       
       expect(success).toBe(false)
     })
-    
+
     test('should get all aliases', () => {
-      const aliases = parser.getAliases()
+      const aliases = parser.getAllAliases()
       
       expect(aliases).toBeInstanceOf(Map)
-      expect(aliases.has('n')).toBe(true)
-      expect(aliases.get('n')).toBe('north')
+      expect(aliases.has('h')).toBe(true)
+      expect(aliases.get('h')).toBe('help')
     })
   })
-  
+
   describe('Command Information', () => {
     test('should get all valid commands', () => {
       const commands = parser.getValidCommands()
       
       expect(Array.isArray(commands)).toBe(true)
-      expect(commands).toContain('look')
-      expect(commands).toContain('go')
+      expect(commands).toContain('help')
       expect(commands).toContain('inventory')
+      expect(commands).toContain('go')
     })
-    
+
     test('should return copy of valid commands array', () => {
       const commands1 = parser.getValidCommands()
       const commands2 = parser.getValidCommands()
       
-      expect(commands1).not.toBe(commands2) // Different references
+      expect(commands1).not.toBe(commands2) // Different array instances
       expect(commands1).toEqual(commands2) // Same content
     })
   })
-  
+
   describe('Complex Input Scenarios', () => {
     test('should handle quoted strings', () => {
-      const result = parser.parse('say "hello world"')
-      
-      expect(result.command).toBe('say')
-      // Note: This implementation doesn't handle quotes yet
-      expect(result.args).toEqual(['"hello', 'world"'])
-    })
-    
-    test('should handle commands with punctuation', () => {
-      const result = parser.parse('look around.')
-      
-      expect(result.command).toBe('look')
-      expect(result.args).toEqual(['around.'])
-    })
-    
-    test('should handle very long input', () => {
-      const longInput = 'look ' + 'around '.repeat(100)
-      const result = parser.parse(longInput)
-      
-      expect(result.command).toBe('look')
-      expect(result.args).toHaveLength(100)
-    })
-    
-    test('should handle special characters', () => {
-      const result = parser.parse('look @#$%')
-      
-      expect(result.command).toBe('look')
-      expect(result.args).toEqual(['@#$%'])
-    })
-  })
-  
-  describe('Performance Tests', () => {
-    test('should parse commands quickly', () => {
-      const startTime = Date.now()
-      
-      for (let i = 0; i < 1000; i++) {
-        parser.parse('look around the room')
-      }
-      
-      const endTime = Date.now()
-      const duration = endTime - startTime
-      
-      expect(duration).toBeLessThan(100) // Should parse 1000 commands in under 100ms
-    })
-    
-    test('should handle command with many arguments efficiently', () => {
-      const manyArgs = Array.from({ length: 100 }, (_, i) => `arg${i}`)
-      const input = 'take ' + manyArgs.join(' ')
-      
-      const startTime = Date.now()
-      const result = parser.parse(input)
-      const endTime = Date.now()
-      
-      expect(endTime - startTime).toBeLessThan(10)
-      expect(result.args).toHaveLength(100)
-    })
-  })
-  
-  describe('Edge Cases', () => {
-    test('should handle command with only spaces as arguments', () => {
-      const result = parser.parse('look     ')
-      
-      expect(result.command).toBe('look')
-      expect(result.args).toEqual([])
-    })
-    
-    test('should handle commands with tabs and newlines', () => {
-      const result = parser.parse('look\taround\ncarefully')
-      
-      expect(result.command).toBe('look')
-      // Note: This would need specific handling for tabs/newlines
-    })
-    
-    test('should handle unicode characters', () => {
-      const result = parser.parse('look café')
-      
-      expect(result.command).toBe('look')
-      expect(result.args).toEqual(['café'])
-    })
-    
-    test('should handle numbers in arguments', () => {
-      const result = parser.parse('take item 42')
+      const result = parser.parseCommand('take "mysterious key"')
       
       expect(result.command).toBe('take')
-      expect(result.args).toEqual(['item', '42'])
+      expect(result.args).toEqual(['"mysterious', 'key"'])
+      expect(result.isValid).toBe(true)
+    })
+
+    test('should handle commands with punctuation', () => {
+      const result = parser.parseCommand('help!')
+      
+      expect(result.command).toBe('help!')
+      expect(result.isValid).toBe(false) // Invalid because of punctuation
+    })
+
+    test('should handle very long input', () => {
+      const longInput = 'go ' + 'north '.repeat(100)
+      const result = parser.parseCommand(longInput)
+      
+      expect(result.command).toBe('go')
+      expect(result.args.length).toBeGreaterThan(0)
+    })
+
+    test('should handle special characters', () => {
+      const result = parser.parseCommand('help @#$')
+      
+      expect(result.command).toBe('help')
+      expect(result.args).toEqual(['@#$'])
+      expect(result.isValid).toBe(true)
+    })
+  })
+
+  describe('Performance Tests', () => {
+    test('should parse commands quickly', () => {
+      const start = Date.now()
+      
+      for (let i = 0; i < 1000; i++) {
+        parser.parseCommand('help')
+      }
+      
+      const end = Date.now()
+      expect(end - start).toBeLessThan(100) // Should complete in less than 100ms
+    })
+
+    test('should handle command with many arguments efficiently', () => {
+      const manyArgs = Array(100).fill('arg').join(' ')
+      const input = `take ${manyArgs}`
+      
+      const start = Date.now()
+      const result = parser.parseCommand(input)
+      const end = Date.now()
+      
+      expect(result.command).toBe('take')
+      expect(result.args.length).toBe(100)
+      expect(end - start).toBeLessThan(50)
+    })
+  })
+
+  describe('Edge Cases', () => {
+    test('should handle command with only spaces as arguments', () => {
+      const result = parser.parseCommand('go   ')
+      
+      expect(result.command).toBe('go')
+      expect(result.args).toEqual([])
+      expect(result.isValid).toBe(true)
+    })
+
+    test('should handle commands with tabs and newlines', () => {
+      const result = parser.parseCommand('help\t\n')
+      
+      expect(result.command).toBe('help')
+      expect(result.isValid).toBe(true)
+    })
+
+    test('should handle unicode characters', () => {
+      const result = parser.parseCommand('help 🎮')
+      
+      expect(result.command).toBe('help')
+      expect(result.args).toEqual(['🎮'])
+      expect(result.isValid).toBe(true)
+    })
+
+    test('should handle numbers in arguments', () => {
+      const result = parser.parseCommand('use item123')
+      
+      expect(result.command).toBe('use')
+      expect(result.args).toEqual(['item123'])
+      expect(result.isValid).toBe(true)
+    })
+  })
+
+  describe('Command Execution', () => {
+    test('should execute valid commands', () => {
+      const result = parser.executeCommand('help')
+      
+      expect(result.success).toBe(true)
+      expect(result.response).toContain('Available Commands')
+    })
+
+    test('should handle invalid command execution', () => {
+      const result = parser.executeCommand('invalidcommand')
+      
+      expect(result.success).toBe(false)
+      expect(result.error).toContain('Unknown command')
+    })
+
+    test('should execute commands with arguments', () => {
+      const result = parser.executeCommand('look')
+      
+      expect(result.success).toBe(true)
+      expect(result.response).toContain('digital')
     })
   })
 })

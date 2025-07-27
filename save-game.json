@@ -1,14 +1,20 @@
 {
+  "isRunning": true,
   "playerName": "",
-  "currentLocation": "start",
-  "inventory": [],
+  "currentLocation": "garden",
+  "gameTime": 3,
+  "inventory": [
+    "mysterious key",
+    "digital flower"
+  ],
   "stats": {
     "health": 100,
     "energy": 100,
-    "mood": "curious"
+    "mood": "energetic"
   },
-  "gameTime": 0,
+  "flags": {},
+  "relationships": {},
+  "lastSaved": "2025-07-27T09:06:31.654Z",
   "achievements": [],
-  "storyFlags": {},
-  "lastSaved": "2025-07-23T23:49:45.823Z"
+  "storyFlags": {}
 }

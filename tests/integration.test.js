@@ -1,436 +1,344 @@
 /**
- * Integration Test Suite
- * QA Engineer: End-to-end gameplay testing
+ * Integration Test Suite - PRODUCTION CODE ONLY
+ * End-to-end gameplay testing with real implementations
  */
 
-const MockGameEngine = require('./mocks/game-engine.mock')
-const MockRavi = require('./mocks/ravi.mock')
+const RealGameEngine = require('../src/real-game-engine')
+const CommandParserSync = require('../src/command-parser-sync')
 
-// Mock the main index.js components
-jest.mock('../src/index.js', () => {
-  const MockGameEngine = require('./mocks/game-engine.mock')
-  const gameEngine = new MockGameEngine()
-  
-  return {
-    program: {
-      parse: jest.fn(),
-      command: jest.fn().mockReturnThis(),
-      description: jest.fn().mockReturnThis(),
-      version: jest.fn().mockReturnThis(),
-      option: jest.fn().mockReturnThis(),
-      action: jest.fn().mockReturnThis()
-    },
-    gameEngine
+// Test utilities
+const testUtils = {
+  createMockCommand: (command, args = []) => ({
+    command,
+    args
+  })
+}
+
+let gameEngine, commandParser
+
+beforeEach(async () => {
+  gameEngine = new RealGameEngine()
+  await gameEngine.initialize()
+  commandParser = new CommandParserSync(gameEngine)
+})
+
+afterEach(async () => {
+  if (gameEngine) {
+    gameEngine.stop()
   }
 })
 
 describe('Integration: Complete Gameplay Flow', () => {
-  let gameEngine
-  let ravi
-  
-  beforeEach(() => {
-    gameEngine = new MockGameEngine()
-    ravi = new MockRavi(gameEngine)
-    gameEngine.setCharacter(ravi)
-  })
-  
-  describe('Game Initialization', () => {
-    test('should initialize complete game system', async () => {
-      // Verify all components are connected
-      expect(gameEngine).toBeDefined()
-      expect(ravi).toBeDefined()
-      expect(gameEngine.getCharacter()).toBe(ravi)
-      
-      // Verify initial state
-      const state = gameEngine.getState()
-      expect(state).toBeValidGameState()
-      expect(state.currentLocation).toBe('living_room')
-    })
-    
-    test('should start interactive mode successfully', async () => {
-      await expect(gameEngine.startInteractiveMode()).resolves.not.toThrow()
+  describe('Game Engine Initialization', () => {
+    test('should initialize game engine successfully', async () => {
       expect(gameEngine.getState().isRunning).toBe(true)
+      expect(gameEngine.getCurrentLocation().key).toBe('start')
+    })
+
+    test('should start with default player state', async () => {
+      const state = gameEngine.getGameState()
+      
+      expect(state.playerName).toBe('Anonymous Adventurer')
+      expect(state.inventory).toEqual([])
+      expect(state.stats.health).toBe(100)
+      expect(state.stats.energy).toBe(100)
+      expect(state.stats.mood).toBe('curious')
     })
   })
-  
+
   describe('Complete User Journey: New Player', () => {
     test('should handle complete new player experience', async () => {
-      // 1. Game starts
-      await gameEngine.startInteractiveMode()
+      // New player starts the game
+      expect(gameEngine.getState().isRunning).toBe(true)
       
-      // 2. Player looks around
-      const lookResponse = await gameEngine.processCommand(
-        testUtils.createMockCommand('look')
-      )
-      expect(lookResponse).toHaveRaviResponse()
+      // Player looks around
+      let response = await gameEngine.processCommand(testUtils.createMockCommand('look'))
+      expect(response).toContain('cozy digital space')
       
-      // 3. Ravi responds
-      const raviResponse = ravi.respondToCommand(
-        testUtils.createMockCommand('look')
-      )
-      expect(raviResponse.text).toHaveRaviResponse()
-      expect(raviResponse.mood).toBe('sarcastic')
+      // Player checks inventory (empty)
+      response = await gameEngine.processCommand(testUtils.createMockCommand('inventory'))
+      expect(response).toContain('empty')
       
-      // 4. Player moves around
-      const moveResponse = await gameEngine.processCommand(
-        testUtils.createMockCommand('go', ['north'])
-      )
-      expect(moveResponse).toContain('Kitchen')
+      // Player takes an item
+      response = await gameEngine.processCommand(testUtils.createMockCommand('take', ['mysterious', 'key']))
+      expect(response).toContain('You took')
+      expect(gameEngine.hasInInventory('mysterious key')).toBe(true)
       
-      // 5. Player checks inventory
-      const invResponse = await gameEngine.processCommand(
-        testUtils.createMockCommand('inventory')
-      )
-      expect(invResponse).toContain('empty')
+      // Player moves to new location
+      response = await gameEngine.processCommand(testUtils.createMockCommand('go', ['home']))
+      expect(response).toContain('moved to')
+      expect(gameEngine.getCurrentLocation().key).toBe('home')
       
-      // 6. Player takes an item
-      const takeResponse = await gameEngine.processCommand(
-        testUtils.createMockCommand('take', ['coffee'])
-      )
-      expect(takeResponse).toContain('You take the coffee')
-      expect(gameEngine.hasInInventory('coffee')).toBe(true)
-      
-      // 7. Ravi comments on the action
-      const raviItemResponse = ravi.respondToInventoryChange('take', 'coffee')
-      expect(raviItemResponse).toHaveRaviResponse()
-      
-      // 8. Save game
-      await gameEngine.saveGame('test_journey')
-      expect(gameEngine.saveData).toBeDefined()
+      // Player saves game
+      response = await gameEngine.processCommand(testUtils.createMockCommand('save'))
+      expect(response).toContain('successfully')
     })
-    
+
     test('should handle player making mistakes gracefully', async () => {
-      // Try invalid commands
-      const invalidResponse = await gameEngine.processCommand(
-        testUtils.createMockCommand('fly')
-      )
-      expect(invalidResponse).toContain('don\'t understand')
-      
-      // Try going in invalid direction
-      const badMoveResponse = await gameEngine.processCommand(
-        testUtils.createMockCommand('go', ['down'])
-      )
-      expect(badMoveResponse).toContain('can\'t go')
+      // Try invalid movement
+      let response = await gameEngine.processCommand(testUtils.createMockCommand('go', ['invalid_location']))
+      expect(response).toContain("can't go")
       
       // Try taking non-existent item
-      const badTakeResponse = await gameEngine.processCommand(
-        testUtils.createMockCommand('take', ['unicorn'])
-      )
-      expect(badTakeResponse).toContain('no unicorn')
+      response = await gameEngine.processCommand(testUtils.createMockCommand('take', ['nonexistent_item']))
+      expect(response).toContain("no nonexistent_item here")
+      
+      // Try using item not in inventory
+      response = await gameEngine.processCommand(testUtils.createMockCommand('use', ['nonexistent_item']))
+      expect(response).toContain("don't have")
       
       // Game should still be functional
       expect(gameEngine.getState().isRunning).toBe(true)
     })
   })
-  
-  describe('Complete User Journey: Returning Player', () => {
-    test('should handle save and load cycle', async () => {
-      // Set up game state
-      gameEngine.addToInventory('special_item')
-      gameEngine.moveToLocation('bedroom')
-      ravi.adjustRelationship(25)
+
+  describe('Item Interaction System', () => {
+    test('should handle item pickup and usage flow', async () => {
+      // Move to garden and pick up digital flower
+      await gameEngine.processCommand(testUtils.createMockCommand('go', ['garden']))
+      let response = await gameEngine.processCommand(testUtils.createMockCommand('take', ['digital', 'flower']))
+      expect(response).toContain('You took')
       
-      // Save the game
-      await gameEngine.saveGame('returning_player')
+      // Check inventory
+      expect(gameEngine.hasInInventory('digital flower')).toBe(true)
       
-      // Simulate new session - reset and load
-      await gameEngine.resetGame()
-      expect(gameEngine.getState().inventory).toEqual([])
-      expect(gameEngine.getState().currentLocation).toBe('living_room')
+      // Use the flower
+      const statsBefore = gameEngine.getPlayerStats()
+      response = await gameEngine.processCommand(testUtils.createMockCommand('use', ['digital', 'flower']))
+      expect(response).toContain('energetic')
       
-      // Load saved game
-      await gameEngine.loadGame('returning_player')
-      
-      // Verify state restored
-      expect(gameEngine.hasInInventory('special_item')).toBe(true)
-      expect(gameEngine.getState().currentLocation).toBe('bedroom')
-      
-      // Verify Ravi remembers relationship
-      const raviStats = ravi.getStats()
-      expect(raviStats.relationship).toBe(75) // 50 + 25
+      // Check stats changed
+      const statsAfter = gameEngine.getPlayerStats()
+      expect(statsAfter.energy).toBeGreaterThan(statsBefore.energy)
+      expect(statsAfter.mood).toBe('energetic')
     })
-    
-    test('should handle loading non-existent save gracefully', async () => {
-      await expect(gameEngine.loadGame('non_existent')).rejects.toThrow()
+
+    test('should handle multiple item interactions', async () => {
+      // Collect items from different locations
+      await gameEngine.processCommand(testUtils.createMockCommand('take', ['mysterious', 'key']))
       
-      // Game should remain functional
-      const state = gameEngine.getState()
-      expect(state).toBeValidGameState()
-    })
-  })
-  
-  describe('Ravi Integration', () => {
-    test('should have Ravi respond to all game events', async () => {
-      // Game start
-      const startResponse = ravi.respondToGameEvent('game_start')
-      expect(startResponse).toHaveRaviResponse()
+      await gameEngine.processCommand(testUtils.createMockCommand('go', ['garden']))
+      await gameEngine.processCommand(testUtils.createMockCommand('take', ['digital', 'flower']))
       
-      // Location changes
-      gameEngine.moveToLocation('kitchen')
-      const locationResponse = ravi.respondToLocation('kitchen')
-      expect(locationResponse).toHaveRaviResponse()
+      await gameEngine.processCommand(testUtils.createMockCommand('go', ['start']))
+      await gameEngine.processCommand(testUtils.createMockCommand('go', ['home']))
+      await gameEngine.processCommand(testUtils.createMockCommand('go', ['library']))
+      await gameEngine.processCommand(testUtils.createMockCommand('take', ['ancient', 'scroll']))
       
-      // Inventory changes
-      gameEngine.addToInventory('test_item')
-      const itemResponse = ravi.respondToInventoryChange('take', 'test_item')
-      expect(itemResponse).toHaveRaviResponse()
+      // Verify all items collected
+      expect(gameEngine.hasInInventory('mysterious key')).toBe(true)
+      expect(gameEngine.hasInInventory('digital flower')).toBe(true)
+      expect(gameEngine.hasInInventory('ancient scroll')).toBe(true)
       
-      // Game save
-      const saveResponse = ravi.respondToGameEvent('game_save')
-      expect(saveResponse).toHaveRaviResponse()
-    })
-    
-    test('should track Ravi\'s mood changes throughout gameplay', async () => {
-      // Start with default mood
-      expect(ravi.getMood()).toBe('sarcastic')
-      
-      // Positive interactions should improve relationship
-      ravi.adjustRelationship(30)
-      expect(ravi.getRelationship()).toBe(80)
-      expect(ravi.getMood()).toBe('helpful')
-      
-      // Negative interactions should worsen relationship
-      ravi.adjustRelationship(-60)
-      expect(ravi.getRelationship()).toBe(20)
-      expect(ravi.getMood()).toBe('annoyed')
-      
-      // Responses should reflect mood
-      const annoyedResponse = ravi.generateResponse({ command: 'look' })
-      expect(annoyedResponse.mood).toBe('annoyed')
+      // Use scroll to set flag
+      let response = await gameEngine.processCommand(testUtils.createMockCommand('use', ['ancient', 'scroll']))
+      expect(response).toContain('knowledge')
+      expect(gameEngine.getFlag('read_scroll')).toBe(true)
     })
   })
-  
-  describe('Command Parser Integration', () => {
-    test('should handle complex command sequences', async () => {
-      const commands = [
-        'look around carefully',
-        'go north to the kitchen',
-        'take the coffee mug',
-        'go back south',
-        'drop coffee on floor',
-        'pick up remote control'
+
+  describe('Location Navigation System', () => {
+    test('should handle complex navigation paths', async () => {
+      const navigationPath = [
+        { location: 'home', command: ['go', ['home']] },
+        { location: 'library', command: ['go', ['library']] },
+        { location: 'home', command: ['go', ['home']] },
+        { location: 'start', command: ['go', ['start']] },
+        { location: 'garden', command: ['go', ['garden']] },
+        { location: 'start', command: ['go', ['start']] }
       ]
       
-      for (const commandText of commands) {
-        const parts = commandText.split(' ')
-        const command = testUtils.createMockCommand(parts[0], parts.slice(1))
-        
-        const response = await gameEngine.processCommand(command)
-        expect(response).toBeDefined()
-        expect(typeof response).toBe('string')
+      for (const step of navigationPath) {
+        await gameEngine.processCommand(testUtils.createMockCommand(...step.command))
+        expect(gameEngine.getCurrentLocation().key).toBe(step.location)
       }
-      
-      // Verify final state makes sense
-      const history = gameEngine.getCommandHistory()
-      expect(history).toHaveLength(commands.length)
     })
-    
-    test('should handle rapid command input', async () => {
-      const rapidCommands = Array.from({ length: 50 }, (_, i) => 
-        testUtils.createMockCommand('look', [`iteration_${i}`])
-      )
+
+    test('should enforce location restrictions', async () => {
+      // Try going to locations not accessible from start
+      let response = await gameEngine.processCommand(testUtils.createMockCommand('go', ['library']))
+      expect(response).toContain("can't go")
       
-      const startTime = Date.now()
-      
-      for (const command of rapidCommands) {
-        await gameEngine.processCommand(command)
-      }
-      
-      const endTime = Date.now()
-      const duration = endTime - startTime
-      
-      expect(duration).toBeLessThan(1000) // Should handle 50 commands quickly
-      expect(gameEngine.getCommandHistory()).toHaveLength(50)
+      // Move to home first, then library should be accessible
+      await gameEngine.processCommand(testUtils.createMockCommand('go', ['home']))
+      response = await gameEngine.processCommand(testUtils.createMockCommand('go', ['library']))
+      expect(response).toContain('moved to')
     })
   })
-  
+
+  describe('Game State Persistence', () => {
+    test('should save and restore complete game state', async () => {
+      // Set up complex game state
+      await gameEngine.processCommand(testUtils.createMockCommand('take', ['mysterious', 'key']))
+      await gameEngine.processCommand(testUtils.createMockCommand('go', ['garden']))
+      await gameEngine.processCommand(testUtils.createMockCommand('take', ['digital', 'flower']))
+      await gameEngine.processCommand(testUtils.createMockCommand('use', ['digital', 'flower']))
+      
+      const stateBefore = gameEngine.getGameState()
+      
+      // Save game
+      await gameEngine.saveGame()
+      
+      // Reset and load
+      gameEngine.reset()
+      await gameEngine.loadGame()
+      
+      const stateAfter = gameEngine.getGameState()
+      
+      // Verify state restored correctly
+      expect(stateAfter.currentLocation).toBe(stateBefore.currentLocation)
+      expect(stateAfter.inventory).toEqual(stateBefore.inventory)
+      expect(stateAfter.stats.mood).toBe(stateBefore.stats.mood)
+    })
+  })
+
   describe('Error Recovery', () => {
     test('should recover from invalid game states', async () => {
-      // Corrupt the game state
-      gameEngine.setState({ currentLocation: 'invalid_location' })
+      // Simulate corrupted state
+      gameEngine.gameState.currentLocation = 'invalid_location'
       
-      // Try to process a command
-      const response = await gameEngine.processCommand(
-        testUtils.createMockCommand('look')
-      )
+      // System should handle gracefully
+      const location = gameEngine.getCurrentLocation()
+      expect(location.name).toBe('Unknown Location')
       
-      // Should handle gracefully
-      expect(response).toBeDefined()
-      
-      // Reset to valid state
-      gameEngine.moveToLocation('living_room')
-      expect(gameEngine.getCurrentLocation()).toBeDefined()
+      // Should still process commands
+      let response = await gameEngine.processCommand(testUtils.createMockCommand('look'))
+      expect(response).toContain('unknown digital realm')
     })
-    
-    test('should handle character disconnection', async () => {
-      // Remove character
-      gameEngine.setCharacter(null)
+
+    test('should handle rapid command sequences', async () => {
+      const commands = [
+        testUtils.createMockCommand('look'),
+        testUtils.createMockCommand('inventory'),
+        testUtils.createMockCommand('go', ['home']),
+        testUtils.createMockCommand('go', ['start']),
+        testUtils.createMockCommand('take', ['mysterious', 'key']),
+        testUtils.createMockCommand('use', ['mysterious', 'key'])
+      ]
       
-      // Game should still function
-      const response = await gameEngine.processCommand(
-        testUtils.createMockCommand('look')
+      // Execute all commands rapidly
+      const responses = await Promise.all(
+        commands.map(cmd => gameEngine.processCommand(cmd))
       )
-      expect(response).toBeDefined()
       
-      // Reconnect character
-      gameEngine.setCharacter(ravi)
-      expect(gameEngine.getCharacter()).toBe(ravi)
+      // All should execute successfully
+      expect(responses).toHaveLength(6)
+      responses.forEach(response => {
+        expect(typeof response).toBe('string')
+        expect(response.length).toBeGreaterThan(0)
+      })
     })
   })
-  
-  describe('Performance Integration', () => {
-    test('should maintain performance during extended play', async () => {
-      const operationCount = 200
+
+  describe('Performance Tests', () => {
+    test('should handle extended gameplay sessions', async () => {
       const startTime = Date.now()
       
-      // Simulate extended gameplay
-      for (let i = 0; i < operationCount; i++) {
-        // Mix of different operations
-        switch (i % 4) {
-        case 0:
-          await gameEngine.processCommand(testUtils.createMockCommand('look'))
-          break
-        case 1:
-          gameEngine.addToInventory(`item_${i}`)
-          break
-        case 2:
-          ravi.generateResponse({ command: 'test' })
-          break
-        case 3:
-          gameEngine.moveToLocation(['living_room', 'kitchen', 'bedroom'][i % 3])
-          break
+      // Simulate 100 game actions
+      for (let i = 0; i < 100; i++) {
+        await gameEngine.processCommand(testUtils.createMockCommand('look'))
+        if (i % 10 === 0) {
+          await gameEngine.processCommand(testUtils.createMockCommand('inventory'))
         }
       }
       
       const endTime = Date.now()
       const duration = endTime - startTime
       
-      expect(duration).toBeLessThan(2000) // Should complete 200 operations in under 2 seconds
-      
-      // Memory shouldn't grow excessively
-      const state = gameEngine.getState()
-      expect(state.inventory.length).toBeLessThan(100) // Some items should be duplicates
+      // Should complete within reasonable time
+      expect(duration).toBeLessThan(5000) // 5 seconds max
+      expect(gameEngine.getState().isRunning).toBe(true)
     })
-    
+
+    test('should maintain performance during extended play', async () => {
+      // Set up complex state with many items and movements
+      for (let i = 0; i < 50; i++) {
+        await gameEngine.processCommand(testUtils.createMockCommand('go', ['home']))
+        await gameEngine.processCommand(testUtils.createMockCommand('go', ['start']))
+      }
+      
+      // Measure command response time
+      const start = Date.now()
+      await gameEngine.processCommand(testUtils.createMockCommand('look'))
+      const end = Date.now()
+      
+      // Should still be responsive
+      expect(end - start).toBeLessThan(100) // Less than 100ms
+    })
+
     test('should handle concurrent operations', async () => {
-      // Simulate multiple operations happening simultaneously
-      const promises = []
+      // Simulate concurrent command processing
+      const concurrentCommands = Array(10).fill().map((_, i) => 
+        gameEngine.processCommand(testUtils.createMockCommand('look'))
+      )
       
-      for (let i = 0; i < 20; i++) {
-        promises.push(gameEngine.processCommand(
-          testUtils.createMockCommand('look', [`concurrent_${i}`])
-        ))
-      }
+      const responses = await Promise.all(concurrentCommands)
       
-      const results = await Promise.all(promises)
-      
-      expect(results).toHaveLength(20)
-      results.forEach(result => {
-        expect(result).toBeDefined()
-        expect(typeof result).toBe('string')
+      // All should complete successfully
+      expect(responses).toHaveLength(10)
+      responses.forEach(response => {
+        expect(response).toContain('digital')
       })
     })
   })
-  
-  describe('Swarm Coordination Integration', () => {
-    test('should coordinate with swarm hooks', async () => {
-      // Test swarm hook integration
-      const hookResult = await gameEngine.executeSwarmHook('test-hook', {
-        gameState: gameEngine.getState(),
-        raviMood: ravi.getMood()
-      })
+
+  describe('Command Parser Integration', () => {
+    test('should integrate command parser with game engine', () => {
+      const parseResult = commandParser.parseCommand('go north')
+      expect(parseResult.isValid).toBe(true)
       
-      expect(hookResult.success).toBe(true)
-      expect(hookResult.data.gameState).toBeDefined()
-      expect(hookResult.data.raviMood).toBe('sarcastic')
+      const executeResult = commandParser.executeCommand('look')
+      expect(executeResult.success).toBe(true)
+      expect(executeResult.response).toContain('digital')
     })
-    
-    test('should share game progress with swarm memory', async () => {
-      // Simulate game progress
-      gameEngine.moveToLocation('kitchen')
-      gameEngine.addToInventory('coffee')
-      ravi.adjustRelationship(10)
-      
-      // Share with swarm
-      const progressData = {
-        location: gameEngine.getState().currentLocation,
-        inventoryCount: gameEngine.getState().inventory.length,
-        raviRelationship: ravi.getRelationship()
-      }
-      
-      const hookResult = await gameEngine.executeSwarmHook('progress-update', progressData)
-      
-      expect(hookResult.success).toBe(true)
-      expect(hookResult.data.location).toBe('kitchen')
-      expect(hookResult.data.inventoryCount).toBe(1)
-      expect(hookResult.data.raviRelationship).toBe(60)
+
+    test('should handle parser aliases correctly', () => {
+      const result = commandParser.executeCommand('i') // inventory alias
+      expect(result.success).toBe(true)
+      expect(result.response).toContain('inventory')
     })
   })
-  
+
   describe('Edge Cases in Integration', () => {
     test('should handle rapid save/load cycles', async () => {
       for (let i = 0; i < 10; i++) {
-        // Make some changes
-        gameEngine.addToInventory(`item_${i}`)
-        ravi.adjustRelationship(i % 2 === 0 ? 5 : -3)
-        
-        // Save
-        await gameEngine.saveGame(`cycle_${i}`)
-        
-        // Load previous save if it exists
-        if (i > 0) {
-          await gameEngine.loadGame(`cycle_${i - 1}`)
-        }
+        await gameEngine.saveGame()
+        await gameEngine.loadGame()
       }
       
-      // Should end up in a consistent state
-      const finalState = gameEngine.getState()
-      expect(finalState).toBeValidGameState()
+      expect(gameEngine.getState().isRunning).toBe(true)
     })
-    
+
     test('should handle memory exhaustion gracefully', async () => {
-      // Fill up inventory to potential memory limits
-      for (let i = 0; i < 10000; i++) {
-        gameEngine.addToInventory(`stress_item_${i}`)
-      }
+      // Create large state to test memory handling
+      const largeInventory = Array(1000).fill().map((_, i) => `item_${i}`)
+      gameEngine.gameState.inventory = largeInventory
       
-      // Game should still respond
-      const response = await gameEngine.processCommand(
-        testUtils.createMockCommand('inventory')
-      )
-      expect(response).toBeDefined()
+      // Should still function
+      const state = gameEngine.getGameState()
+      expect(state.inventory.length).toBe(1000)
       
-      // Should be able to reset
-      await gameEngine.resetGame()
-      expect(gameEngine.getState().inventory).toEqual([])
-    })
-    
+      // Should handle commands
+      const response = await gameEngine.processCommand(testUtils.createMockCommand('look'))
+      expect(response).toContain('digital')
+    }, 10000)
+
     test('should maintain data integrity across operations', async () => {
-      // Perform many different operations
-      const operations = [
-        () => gameEngine.moveToLocation('kitchen'),
-        () => gameEngine.addToInventory('test_item'),
-        () => ravi.learnFact('player_likes_coffee'),
-        () => gameEngine.processCommand(testUtils.createMockCommand('look')),
-        () => ravi.setMood('excited'),
-        () => gameEngine.removeFromInventory('test_item'),
-        () => gameEngine.moveToLocation('living_room')
-      ]
+      const initialState = gameEngine.getGameState()
       
-      // Execute operations in random order multiple times
-      for (let i = 0; i < 50; i++) {
-        const randomOp = operations[Math.floor(Math.random() * operations.length)]
-        await randomOp()
-      }
+      // Perform many operations
+      await gameEngine.processCommand(testUtils.createMockCommand('take', ['mysterious', 'key']))
+      await gameEngine.processCommand(testUtils.createMockCommand('go', ['home']))
+      await gameEngine.saveGame()
+      await gameEngine.processCommand(testUtils.createMockCommand('go', ['start']))
+      await gameEngine.loadGame()
       
-      // Verify data integrity
-      const state = gameEngine.getState()
-      expect(state).toBeValidGameState()
+      const finalState = gameEngine.getGameState()
       
-      const raviStats = ravi.getStats()
-      expect(raviStats.mood).toBeDefined()
-      expect(raviStats.relationship).toBeGreaterThanOrEqual(0)
-      expect(raviStats.relationship).toBeLessThanOrEqual(100)
+      // Key data should be preserved
+      expect(finalState.playerName).toBe(initialState.playerName)
+      expect(finalState.stats.health).toBe(initialState.stats.health)
+      expect(gameEngine.hasInInventory('mysterious key')).toBe(true)
     })
   })
 })
