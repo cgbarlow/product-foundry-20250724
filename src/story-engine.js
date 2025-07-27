@@ -51,6 +51,11 @@ class StoryEngine {
       this.currentStory = storyModule.default || storyModule
       this.currentStory.engine = this // Give story access to engine
       
+      // Initialize currentScene to the start scene
+      if (this.currentStory.scenes && this.currentStory.scenes.start) {
+        this.currentStory.currentScene = this.getScene('start')
+      }
+      
       if (this.debugMode) {
         console.log(`[Story Engine] Loaded story: ${storyPath}`)
       }
@@ -150,12 +155,13 @@ class StoryEngine {
       throw new Error(`Choice not found: ${choiceId}`)
     }
 
-    // Record choice in history
+    // Record choice in history (avoid circular reference by not including full story state)
     this.storyHistory.push({
       choiceId,
       choiceData,
       timestamp: Date.now(),
-      storyState: this.getStoryState()
+      sceneId: this.getCurrentScene()?.id,
+      globalFlags: Object.fromEntries(this.globalFlags)
     })
 
     // Execute choice effects
@@ -169,7 +175,14 @@ class StoryEngine {
     }
 
     // Transition to next scene and apply consequences
-    const nextScene = await this.transitionToScene(choice.nextScene)
+    // If no nextScene is specified, use the choice ID as the scene ID
+    const targetSceneId = choice.nextScene || choiceId
+    const nextScene = await this.transitionToScene(targetSceneId)
+    
+    // Update currentScene in story
+    if (this.currentStory && nextScene) {
+      this.currentStory.currentScene = nextScene
+    }
     
     // Apply consequences and triggers from the scene we transitioned to
     if (nextScene && typeof nextScene === 'object' && nextScene.consequences) {
@@ -189,6 +202,9 @@ class StoryEngine {
    */
   findChoice(choiceId) {
     const currentScene = this.getCurrentScene()
+    if (!currentScene) {
+      return null
+    }
     return currentScene.choices?.find(choice => choice.id === choiceId)
   }
 
@@ -267,6 +283,10 @@ class StoryEngine {
    * @param {string} sceneId - Target scene ID
    */
   async transitionToScene(sceneId) {
+    if (!sceneId || typeof sceneId !== 'string') {
+      throw new Error(`Invalid scene ID: ${sceneId}`)
+    }
+    
     if (sceneId.startsWith('story:')) {
       // Load different story module
       const [, storyPath] = sceneId.split(':')
@@ -385,10 +405,17 @@ class StoryEngine {
   getStoryState() {
     return {
       currentStory: this.currentStory?.metadata?.id,
+      currentScene: this.getCurrentScene()?.id,
       globalFlags: Object.fromEntries(this.globalFlags),
       characterRelationships: { ...this.characterRelationships },
       storyFlags: this.globalFlags, // For test compatibility
-      storyHistory: this.storyHistory,
+      storyHistory: this.storyHistory.map(entry => ({
+        choiceId: entry.choiceId,
+        timestamp: entry.timestamp,
+        sceneId: entry.sceneId,
+        // Exclude circular references
+        choiceData: entry.choiceData
+      })),
       timestamp: Date.now()
     }
   }

@@ -240,18 +240,28 @@ class RavisAdventure {
   }
 
   /**
+   * Process text formatting (convert *text* to bold)
+   */
+  formatText(text) {
+    // Convert *text* to bold using chalk
+    return text.replace(/\*(.*?)\*/g, (match, content) => {
+      return chalk.bold(content)
+    })
+  }
+
+  /**
    * Display the current scene
    */
   displayScene(scene) {
     console.log('\n' + '═'.repeat(60))
     console.log(chalk.cyan.bold(`📍 ${scene.title}`))
     console.log('═'.repeat(60))
-    console.log(chalk.white(scene.text))
+    console.log(chalk.white(this.formatText(scene.text)))
     
     if (scene.choices && scene.choices.length > 0) {
       console.log(chalk.yellow('\n🎯 What do you want to do?\n'))
       scene.choices.forEach((choice, index) => {
-        console.log(chalk.white(`${index + 1}. ${choice.text}`))
+        console.log(chalk.white(`${index + 1}. ${this.formatText(choice.text)}`))
       })
     }
     
