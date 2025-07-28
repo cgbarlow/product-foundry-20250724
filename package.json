@@ -1,6 +1,6 @@
 {
   "name": "ravis-adventure",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "type": "module",
   "description": "A profound CLI consciousness exploration platform featuring 220+ scenes of AI ethics, human-AI collaboration, and philosophical inquiry with Ravi, your meta-aware AI companion",
   "main": "src/index.js",
