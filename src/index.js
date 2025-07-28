@@ -809,7 +809,12 @@ async function handleCLI() {
 }
 
 // Only run if this is the main module
-if (import.meta.url === `file://${process.argv[1]}`) {
+// Handle both direct execution and global npm CLI execution
+const isMainModule = import.meta.url === `file://${process.argv[1]}` || 
+                     process.argv[1]?.endsWith('ravis-adventure') ||
+                     process.argv[1] === undefined
+
+if (isMainModule) {
   handleCLI().catch(error => {
     console.error(chalk.red(`Error: ${error.message}`))
     process.exit(1)
