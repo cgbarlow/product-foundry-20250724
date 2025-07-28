@@ -1,0 +1,24 @@
+{
+  "player": {
+    "name": null,
+    "location": "start",
+    "inventory": [],
+    "stats": {
+      "mood": 5,
+      "energy": 10,
+      "curiosity": 8
+    },
+    "flags": {},
+    "turnCount": 0,
+    "startTime": 1753658912944
+  },
+  "world": {
+    "locations": {},
+    "items": {}
+  },
+  "meta": {
+    "version": "1.0.0",
+    "lastSaved": "2025-07-27T23:28:32.944Z",
+    "totalPlayTime": 0
+  }
+}
