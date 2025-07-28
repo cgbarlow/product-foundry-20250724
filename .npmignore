@@ -1,0 +1,37 @@
+# Development and testing files
+tests/
+coverage/
+docs/
+demos/
+logs/
+memory/
+.swarm/
+.claude/
+
+# Configuration files
+babel.config.cjs
+jest.config.cjs
+eslint.config.js
+.roomodes
+.roo/
+
+# Development artifacts
+test-serialization.js
+validate-scenes.js
+validate-closure-scenes.js
+save-game.json
+.ravi-save.json
+
+# Documentation (already in files array)
+IMPLEMENTATION_SUMMARY.md
+USER_PATH_FIXED.md
+CLOSURE_SCENES_IMPLEMENTATION.md
+
+# Git and CI
+.git/
+.github/
+.gitignore
+
+# Node modules and package lock
+node_modules/
+package-lock.json
