@@ -118,21 +118,36 @@ class RavisAdventure {
       playerName = playerName || 'TestPlayer'
       console.log(`Welcome ${playerName}! Starting your adventure...`)
     } else if (!playerName) {
-      const { name } = await inquirer.prompt([
-        {
-          type: 'input',
-          name: 'name',
-          message: 'What should Ravi call you?',
-          default: 'Player',
-          validate: (input) => {
-            if (input.trim().length === 0) {
-              return 'Please enter a name (or just press Enter for "Player")'
-            }
-            return true
-          }
+      // Check TTY availability for proper input handling
+      const isTTYAvailable = process.stdin.isTTY === true || process.stdout.isTTY === true
+      
+      if (!isTTYAvailable) {
+        // Fallback for non-TTY environments (like some CI/CD or containers)
+        playerName = 'Player'
+        console.log(chalk.yellow('🎮 Welcome Player! (Using default name in non-interactive environment)'))
+      } else {
+        try {
+          const { name } = await inquirer.prompt([
+            {
+              type: 'input',
+              name: 'name',
+              message: 'What should Ravi call you?',
+              default: 'Player',
+              validate: (input) => {
+                if (input.trim().length === 0) {
+                  return 'Please enter a name (or just press Enter for "Player")'
+                }
+                return true
+              }
+                }
+          ])
+          playerName = name.trim() || 'Player'
+        } catch (error) {
+          // Fallback if inquirer fails
+          console.log(chalk.yellow('🎮 Welcome Player! (Input error, using default name)'))
+          playerName = 'Player'
         }
-      ])
-      playerName = name.trim() || 'Player'
+      }
     }
 
     if (this.simpleMode) {
